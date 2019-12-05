@@ -1,7 +1,6 @@
 package com.nx.lib;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.*;

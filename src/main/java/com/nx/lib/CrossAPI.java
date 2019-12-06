@@ -31,7 +31,7 @@ public class CrossAPI {
         objectMapper = new ObjectMapper();
     }
 
-    public HashMap getCall(String serviceId, String urlParam) {
+    public Object getCall(String serviceId, String urlParam) {
         RestTemplate rt = new RestTemplate();
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
@@ -45,7 +45,13 @@ public class CrossAPI {
 
         ResponseEntity<Map> res = rt.exchange(url, HttpMethod.GET, requestEntity, Map.class);
 
-        return (HashMap)res.getBody().get("result");
+        int httpStatus = res.getStatusCodeValue();
+
+        if (httpStatus != 200) {
+            return new HashMap<>();
+        }
+
+        return res.getBody().get("result");
     }
 
     public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap) {

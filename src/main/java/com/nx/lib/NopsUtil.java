@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class NopsUtil {
 
+    public static final String SERVER_FREEZING = "1";        // 프리징 서버
     public static final String SERVER_DEV           = "2";        // 개발서버
     public static final String SERVER_GRAPHIC       = "3";        // 그래픽서버
     public static final String SERVER_DESIGN_TEST01 = "4";        // 기획테스트서버01
@@ -25,6 +26,7 @@ public class NopsUtil {
     public static final String SERVER_DAILYQA       = "22";       // DailyQA 서버
     public static final String SERVER_BALANCE       = "23";       // Balance 서버
     public static final String SERVER_COMPANY       = "28";       // 전사테스트서버
+    public static final String SERVER_FREEZINGFIX  = "35";       // 전사테스트서버
 
     public static String getIpAddress() {
 

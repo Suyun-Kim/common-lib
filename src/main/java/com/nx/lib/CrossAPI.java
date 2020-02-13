@@ -4,7 +4,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,19 +35,34 @@ public class CrossAPI {
         objectMapper = new ObjectMapper();
     }
 
-    public Object getCall(String serviceId, String urlParam) {
+    /**
+     * CrossAPI Get 요청
+     * @param serviceId
+     * @param urlParam
+     * @param queryParams
+     * @return
+     */
+    public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
+
         RestTemplate rt = new RestTemplate();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
+            params.add(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
-                + urlParam;
+
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
+                .queryParams(params).build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", CROSS_API_TOKEN);
         HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.GET, requestEntity, Map.class);
+        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
 
         int httpStatus = res.getStatusCodeValue();
 
@@ -52,6 +71,16 @@ public class CrossAPI {
         }
 
         return res.getBody().get("result");
+    }
+
+    /**
+     * CrossAPI GET 요청
+     * @param serviceId
+     * @param urlParam
+     * @return
+     */
+    public Object getCall(String serviceId, String urlParam) {
+        return this.getCall(serviceId, urlParam, new HashMap<>());
     }
 
     public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap) {

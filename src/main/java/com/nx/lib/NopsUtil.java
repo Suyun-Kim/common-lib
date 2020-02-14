@@ -1,5 +1,12 @@
 package com.nx.lib;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nx.lib.exception.BaseException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,9 +15,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class NopsUtil {
 
@@ -213,5 +222,155 @@ public class NopsUtil {
         return true;
 
     }
+
+    /**
+     * 현재 시간을 입력한 포맷에 맞게 출력
+     * @param format ex) yyyy-MM-dd HH:mm:ss
+     * @return
+     */
+    public static String now(String format) {
+
+        try {
+
+            if(format == null || "".equals(format) || "now".equals(format)) {
+                format = "yyyy-MM-dd HH:mm:ss";
+            }
+
+            DateFormat dateFormat = new SimpleDateFormat(format);
+            Date date = new Date();
+
+            return dateFormat.format(date);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException();
+        }
+    }
+
+    /**
+     * Page 객체에 담긴 내용을 Map으로 변환하고 Map의 Key를 필터 할 수 있는 메서드
+     * @param objectList
+     * @param filter
+     * @return
+     */
+    public static Map convertPageObjectToMapList(Page objectList, String... filter) {
+        ObjectMapper mapper = new ObjectMapper();
+        String json;
+        try {
+            json = mapper.writeValueAsString(objectList);
+        } catch (JsonProcessingException e) {
+            json = "";
+            e.printStackTrace();
+        }
+
+        Map<String, Object> map = convertJsonToMap(json, filter);
+
+        map.remove("total");
+        map.remove("pageable");
+
+        Map<String, Object> pageableMap = new LinkedHashMap<>();
+        Map<String, Object> pageableMapAttr = new LinkedHashMap<>();
+        Map<String, Object> sortMapAttr = new LinkedHashMap<>();
+
+        sortMapAttr.put("unsorted", objectList.getPageable().getSort().isUnsorted());
+        sortMapAttr.put("sorted", objectList.getPageable().getSort().isSorted());
+
+        pageableMapAttr.put("sort", sortMapAttr);
+        pageableMapAttr.put("offset", objectList.getPageable().getOffset());
+        pageableMapAttr.put("pageNumber", objectList.getPageable().getPageNumber());
+        pageableMapAttr.put("pageSize", objectList.getPageable().getPageSize());
+        pageableMapAttr.put("paged", objectList.getPageable().isPaged());
+        pageableMapAttr.put("unpaged", objectList.getPageable().isUnpaged());
+
+        pageableMap.put("pageable", pageableMapAttr);
+        pageableMap.put("totalElements", objectList.getTotalElements());
+        pageableMap.put("totalPages", objectList.getTotalPages());
+        pageableMap.put("last", objectList.isLast());
+        pageableMap.put("size", objectList.getSize());
+        pageableMap.put("number", objectList.getNumber());
+        pageableMap.put("sort", sortMapAttr);
+        pageableMap.put("numberOfElements", objectList.getNumberOfElements());
+        pageableMap.put("first", objectList.isFirst());
+
+        map.putAll(pageableMap);
+
+        // orderNum 세팅
+        setOrderNum(map);
+
+        return map;
+    }
+
+    /**
+     * Page 객체에 담긴 내용을 Map으로 변환하고 Map의 Key를 필터 할 수 있는 메서드 ( 가공 안하고 싶을때 사용 )
+     * @param json
+     * @param filter
+     * @return
+     */
+    public static Map<String, Object> convertJsonToMap(String json, String... filter) {
+
+        Map<String, Object> map = new HashMap<>();
+        // convert JSON string to Map
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+
+            map = mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
+
+            if(filter != null && filter.length > 0) {
+                List<Map<String, Object>> mapList = (List)map.get("content");
+                for(Map<String, Object> data : mapList) {
+                    for(String str : filter) {
+                        if(data.containsKey(str)) {
+                            data.remove(str);
+                        }
+
+                    }
+                }
+            }
+
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();
+            throw new BaseException();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+            throw new BaseException();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BaseException();
+        }
+
+        return map;
+    }
+
+    /**
+     * orderNum 컬럼의 순번을 매길때 사용
+     * @param dataMap
+     * @return
+     */
+    public static Map<String, Object> setOrderNum(Map<String, Object> dataMap) {
+
+        try {
+
+            int totalElements = Integer.parseInt(dataMap.get("totalElements").toString());              // totalElements : 73
+            int numberOfElements = Integer.parseInt(dataMap.get("numberOfElements").toString());        // numberOfElements : 13
+            int size = Integer.parseInt(dataMap.get("size").toString());                                // size : 15
+            int number = Integer.parseInt(dataMap.get("number").toString());                            // number : 4
+
+            int startOrder = (totalElements - (size * number));                                         // 13
+            int endOrder = (startOrder - numberOfElements);                                             // 0
+
+            int cnt = 0;
+            for(int i=startOrder; i > endOrder; i--) {
+                (((List<Map<String, Object>>) dataMap.get("content")).get(cnt)).put("orderNum", i);
+                cnt++;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException();
+        }
+
+        return dataMap;
+    }
+
 
 }

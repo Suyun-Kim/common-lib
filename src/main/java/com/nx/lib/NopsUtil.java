@@ -174,6 +174,11 @@ public class NopsUtil {
 
     }
 
+    public static boolean sendNotificationSlackTarget(String content, String target) {
+        String recipients = "\"" + target + "\"";
+        return sendNotifications(content, "","black",recipients);
+    }
+
     public static boolean sendNotificationChannel(String content, String channel) {
         String recipients = "\"#" + channel + "\"";
         return sendNotifications(content, "","black",recipients);
@@ -184,7 +189,13 @@ public class NopsUtil {
         return sendNotifications(content, "","black",recipients);
     }
 
-    private static boolean sendNotifications(String content, String attachments, String color, String recipients) {
+    public static boolean sendNotificationUsers(String content, List<String> userList) {
+        String recipients = String.join("\",\"@", userList);
+        recipients = "\"@" + recipients + "\"";
+        return sendNotifications(content, "","black",recipients);
+    }
+
+    public static boolean sendNotifications(String content, String attachments, String color, String recipients) {
 
         try {
             // noti API 호출할 url 생성

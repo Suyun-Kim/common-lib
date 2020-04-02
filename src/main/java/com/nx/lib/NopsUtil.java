@@ -23,19 +23,19 @@ import java.util.*;
 
 public class NopsUtil {
 
-    public static final String SERVER_FREEZING = "1";        // 프리징 서버
+    public static final String SERVER_FREEZING      = "1";        // 프리징 서버
     public static final String SERVER_DEV           = "2";        // 개발서버
-    public static final String SERVER_GRAPHIC       = "3";        // 그래픽서버
     public static final String SERVER_DESIGN_TEST01 = "4";        // 기획테스트서버01
     public static final String SERVER_DESIGN_TEST02 = "5";        // 기획테스트서버02
     public static final String SERVER_DESIGN_TEST03 = "6";        // 기획테스트서버03
     public static final String SERVER_DESIGN_TEST04 = "7";        // 기획테스트서버04
     public static final String SERVER_DESIGN_TEST05 = "8";        // 기획테스트서버05
+    public static final String SERVER_DESIGN_TEST06 = "3";        // 기획테스트서버06
     public static final String SERVER_QA            = "18";       // QA 서버 (개발DB씀)
     public static final String SERVER_DAILYQA       = "22";       // DailyQA 서버
     public static final String SERVER_BALANCE       = "23";       // Balance 서버
     public static final String SERVER_COMPANY       = "28";       // 전사테스트서버
-    public static final String SERVER_FREEZINGFIX  = "35";       // 전사테스트서버
+    public static final String SERVER_FREEZINGFIX   = "35";       // 프리징픽스
 
     public static String getIpAddress() {
 

@@ -53,11 +53,6 @@ public class CrossAPI {
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
 
-        // #은 Hash Mark로 인식하여 #뒤로 모든 Query String이 잘리므로 URL Encoding 시킨다.
-        // URLEncoder.encode(...) 메서드를 사용할경우 경로구분용으로 사용되는 [/]와 [=]등 필수적인 문자들이 Encoding 되어버리므로
-        // #만 Encoding 하였음
-        urlParam = urlParam.replace("#", "%23");
-
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
                 .queryParams(params).build();
@@ -91,11 +86,6 @@ public class CrossAPI {
     public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap) {
         RestTemplate rt = new RestTemplate();
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
-
-        // #은 Hash Mark로 인식하여 #뒤로 모든 Query String이 잘리므로 URL Encoding 시킨다.
-        // URLEncoder.encode(...) 메서드를 사용할경우 경로구분용으로 사용되는 [/]와 [=]등 필수적인 문자들이 Encoding 되어버리므로
-        // #만 Encoding 하였음
-        urlParam = urlParam.replace("#", "%23");
 
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
         String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()

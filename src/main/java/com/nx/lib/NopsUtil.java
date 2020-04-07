@@ -31,6 +31,7 @@ public class NopsUtil {
     public static final String SERVER_DESIGN_TEST04 = "7";        // 기획테스트서버04
     public static final String SERVER_DESIGN_TEST05 = "8";        // 기획테스트서버05
     public static final String SERVER_DESIGN_TEST06 = "3";        // 기획테스트서버06
+    public static final String SERVER_DESIGN_TEST07 = "15";       // 기획테스트서버07
     public static final String SERVER_QA            = "18";       // QA 서버 (개발DB씀)
     public static final String SERVER_DAILYQA       = "22";       // DailyQA 서버
     public static final String SERVER_BALANCE       = "23";       // Balance 서버

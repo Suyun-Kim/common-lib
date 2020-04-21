@@ -16,6 +16,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -382,6 +384,23 @@ public class NopsUtil {
         }
 
         return dataMap;
+    }
+
+    public static String getLogText(Exception ex, String ipAddress){
+        String message = ex.getMessage() == null ? "" : ex.getMessage();
+        String cause = ex.getClass() == null ? "UNKNOWN" : ex.getClass().getName();
+
+        if(ex instanceof BaseException) {
+            return cause + "#" + message + "#IP:"+ipAddress + ", " + ((BaseException) ex).getCode() + " \n" + getStackTrace(ex);
+        } else {
+            return cause + "#" + message + "#IP:"+ipAddress + " \n" + getStackTrace(ex);
+        }
+    }
+
+    public static String getStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 
 

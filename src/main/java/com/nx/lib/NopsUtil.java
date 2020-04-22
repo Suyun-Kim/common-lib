@@ -385,23 +385,4 @@ public class NopsUtil {
 
         return dataMap;
     }
-
-    public static String getLogText(Exception ex, String ipAddress){
-        String message = ex.getMessage() == null ? "" : ex.getMessage();
-        String cause = ex.getClass() == null ? "UNKNOWN" : ex.getClass().getName();
-
-        if(ex instanceof BaseException) {
-            return cause + "#" + message + "#IP:"+ipAddress + ", " + ((BaseException) ex).getCode() + " \n" + getStackTrace(ex);
-        } else {
-            return cause + "#" + message + "#IP:"+ipAddress + " \n" + getStackTrace(ex);
-        }
-    }
-
-    public static String getStackTrace(Throwable t) {
-        StringWriter sw = new StringWriter();
-        t.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
-
-
 }

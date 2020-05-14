@@ -37,7 +37,7 @@ public class NopsUtil {
     public static final String SERVER_QA            = "18";       // QA 서버 (개발DB씀)
     public static final String SERVER_DAILYQA       = "22";       // DailyQA 서버
     public static final String SERVER_BALANCE       = "23";       // Balance 서버
-    public static final String SERVER_COMPANY       = "28";       // 전사테스트서버
+    public static final String SERVER_POLISHING     = "28";       // 폴리싱서버
     public static final String SERVER_FREEZINGFIX   = "35";       // 프리징픽스
 
     public static String getIpAddress() {

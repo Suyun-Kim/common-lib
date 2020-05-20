@@ -108,4 +108,54 @@ public class CrossAPI {
         return res.getStatusCode();
     }
 
+    public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap) {
+        RestTemplate rt = new RestTemplate();
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
+                + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", CROSS_API_TOKEN);
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
+        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
+
+        return res.getStatusCode();
+    }
+
+    public HttpStatus deleteCall(String serviceId, String urlParam, HashMap bodyMap) {
+        RestTemplate rt = new RestTemplate();
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
+                + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", CROSS_API_TOKEN);
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
+        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.DELETE, requestEntity, Map.class);
+
+        return res.getStatusCode();
+    }
+
 }

@@ -133,29 +133,35 @@ public class CrossAPI {
         return res.getStatusCode();
     }
 
-    public HttpStatus deleteCall(String serviceId, String urlParam, HashMap bodyMap) {
-        RestTemplate rt = new RestTemplate();
-        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
 
+        RestTemplate rt = new RestTemplate();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
+            params.add(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
-                + urlParam;
+
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
+                .queryParams(params).build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", CROSS_API_TOKEN);
+        HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
-        String bodyStr = "";
-        try {
-            bodyStr = objectMapper.writeValueAsString(bodyMap);
-        } catch (IOException e) {
-            e.printStackTrace();
+        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
+
+        int httpStatus = res.getStatusCodeValue();
+
+        if (httpStatus != 200) {
+            return new HashMap<>();
         }
 
-        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.DELETE, requestEntity, Map.class);
-
-        return res.getStatusCode();
+        return res.getBody().get("result");
     }
 
 }

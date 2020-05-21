@@ -9,9 +9,9 @@ public class ResponsePagingEnvelop<T> {
 	private Error error;
 	private int size;
 	private int page;
-	private int totalElements;
+	private long totalElements;
 
-	public ResponsePagingEnvelop(boolean success, T result, String code, String message, int size, int page, int totalElements){
+	public ResponsePagingEnvelop(boolean success, T result, String code, String message, int size, int page, long totalElements){
 		this.success = success;
 		this.result = result;
 		this.error = new Error(code, message);
@@ -29,7 +29,7 @@ public class ResponsePagingEnvelop<T> {
 		this.totalElements = 0;
 	}
 
-	public ResponsePagingEnvelop(boolean success, T result, int size, int page, int totalElements){
+	public ResponsePagingEnvelop(boolean success, T result, int size, int page, long totalElements){
 		this.success = success;
 		this.result = result;
 		this.size = size;
@@ -89,6 +89,29 @@ public class ResponsePagingEnvelop<T> {
 
 	public void setError(Error error) {
 		this.error = error;
-	} 
-	
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
+	}
+
+	public long getTotalElements() {
+		return totalElements;
+	}
+
+	public void setTotalElements(long totalElements) {
+		this.totalElements = totalElements;
+	}
 }

@@ -264,6 +264,27 @@ public class NopsUtil {
     }
 
     /**
+     * Page 객체를 받아서 응답에 사용할수 있는 형식으로 변환
+     * @param page
+     * @return
+     */
+    public static Map convertPageObjectToMapList(Page page) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("content", page.getContent());
+        map.put("size", page.getSize());
+        map.put("page", page.getPageable().getPageNumber());
+        map.put("totalElements", page.getTotalElements());
+
+        map.put("numberOfElements", page.getNumberOfElements());
+        map.put("number", page.getNumber());
+
+        // orderNum 세팅...
+        setOrderNum(map);
+
+        return map;
+    }
+
+    /**
      * Page 객체에 담긴 내용을 Map으로 변환하고 Map의 Key를 필터 할 수 있는 메서드
      * @param objectList
      * @param filter

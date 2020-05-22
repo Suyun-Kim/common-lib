@@ -5,7 +5,14 @@ public class PageResults<T> {
     private int size;
     private int page;
     private long totalElements;
-    private T contents;
+    private T content;
+
+    public PageResults(T content, int size, int page, long totalElements) {
+        this.content = content;
+        this.size = size;
+        this.page = page;
+        this.totalElements = totalElements;
+    }
 
     public int getSize() {
         return size;
@@ -31,11 +38,11 @@ public class PageResults<T> {
         this.totalElements = totalElements;
     }
 
-    public T getContents() {
-        return contents;
+    public T getContent() {
+        return content;
     }
 
-    public void setContents(T contents) {
-        this.contents = contents;
+    public void setContents(T content) {
+        this.content = content;
     }
 }

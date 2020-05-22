@@ -6,22 +6,16 @@ public class ResponsePagingEnvelop<T> {
 	private PageResults<T> result;
 	private Error error;
 
-	public ResponsePagingEnvelop(boolean success, T contents, String code, String message, int size, int page, long totalElements){
-		result = new PageResults();
-		result.setContents(contents);
-		result.setSize(size);
-		result.setPage(page);
-		result.setTotalElements(totalElements);
+	public ResponsePagingEnvelop(boolean success, T content, String code, String message, int size, int page, long totalElements){
+		PageResults<T> pageResults = new PageResults(content, size, page, totalElements);
+		this.result = pageResults;
 		this.success = success;
 		this.error = new Error(code, message);
 	}
 
-	public ResponsePagingEnvelop(boolean success, T contents, int size, int page, long totalElements){
-		result = new PageResults();
-		result.setContents(contents);
-		result.setSize(size);
-		result.setPage(page);
-		result.setTotalElements(totalElements);
+	public ResponsePagingEnvelop(boolean success, T content, int size, int page, long totalElements){
+		PageResults<T> pageResults = new PageResults(content, size, page, totalElements);
+		this.result = pageResults;
 		this.success = success;
 	}
 

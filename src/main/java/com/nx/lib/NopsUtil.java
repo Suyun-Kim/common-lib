@@ -168,6 +168,71 @@ public class NopsUtil {
         }
     }
 
+    /**
+     * 입력으로 받은 테이블을 읽어서 CSV 형식으로 변환한다.
+     *
+     * @param list
+     * @return
+     */
+    public static String makeCSV(List<Map<String, Object>> list, boolean containsHeader) {
+        try {
+
+            if (list.size() > 0) {
+                StringBuilder str = new StringBuilder();
+
+                int i = 0;
+
+                for (Map<String, Object> map : list) {
+
+                    if (i == 0 && containsHeader) {
+                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                            str.append(entry.getKey()).append(",");
+                        }
+
+                        if (map.size() > 0) {
+                            str.deleteCharAt(str.lastIndexOf(",")).append("\n");
+                        }
+                    }
+
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+
+                        String value = String.valueOf(entry.getValue());
+
+                        // 소수점 뒷자리가 .0일경우 제거
+                        if( isNumber(value) ) {
+                            double doubleVal = Double.parseDouble(value);
+                            double result = doubleVal - (int)doubleVal;
+                            if(result == 0) {
+                                value = (int)doubleVal + "";
+                            }
+                        }
+
+                        if (value.contains(",")) {
+                            // 콤마가 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
+                            value.replaceAll("\"", "\"\"");
+                            //콤마가 중간에 있으면 " 으로 감싸줌
+                            str.append("\"").append(value).append("\"");
+                        } else {
+                            str.append(value);
+                        }
+                        str.append(",");
+                    }
+
+                    if (map.size() > 0) {
+                        str.deleteCharAt(str.lastIndexOf(",")).append("\n");
+                    }
+
+                    i++;
+                }
+
+                return str.deleteCharAt(str.lastIndexOf("\n")).toString();
+            } else
+                return "";
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
     public static boolean isNumber(String value) {
 
         try {

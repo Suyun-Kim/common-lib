@@ -166,7 +166,10 @@ public class ValidMap {
             Object v = params.get(k);
             if (v != null && v instanceof Integer) {
                 int parsValue = Integer.valueOf(v.toString());
-                valid(v1 < parsValue, k + " (Under)");
+                valid(v1 <= parsValue, k + " (" + v1 + "자 이상)");
+            } else if (v != null && v instanceof String) {
+                String parsValue = String.valueOf(v);
+                valid(v1 <= parsValue.length(), k + " (" + v1 + "자 이상)");
             }
             return this;
         }
@@ -182,7 +185,10 @@ public class ValidMap {
             Object v = params.get(k);
             if (v != null && v instanceof Integer) {
                 int parsValue = Integer.valueOf(v.toString());
-                valid(v1 > parsValue, k + " (Over)");
+                valid(v1 >= parsValue, k + " (" + v1 + "자 이하)");
+            } else if (v != null && v instanceof String) {
+                String parsValue = String.valueOf(v);
+                valid(v1 >= parsValue.length(), k + " (" + v1 + "자 이하)");
             }
             return this;
         }

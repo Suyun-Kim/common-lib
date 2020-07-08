@@ -1,11 +1,17 @@
 package com.nx.lib;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nx.lib.exception.BaseException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,14 +20,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nx.lib.exception.BaseException;
 
 public class NopsUtil {
 
@@ -41,6 +45,7 @@ public class NopsUtil {
     public static final String SERVER_FREEZINGFIX               = "35";       // 프리징픽스
     public static final String SERVER_POLISHING_DESIGN_TEST01   = "47";       // 폴리싱 기획테스트서버01
     public static final String SERVER_POLISHING_DESIGN_TEST02   = "48";       // 폴리싱 기획테스트서버02
+    public static final String SERVER_FGT                        = "50";       // FGT서버
 
     public static String getIpAddress() {
 

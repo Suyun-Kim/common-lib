@@ -37,15 +37,15 @@ public class NopsUtil {
     public static final String SERVER_DESIGN_TEST04             = "7";        // 기획테스트서버04
     public static final String SERVER_DESIGN_TEST05             = "8";        // 기획테스트서버05
     public static final String SERVER_DESIGN_TEST06             = "3";        // 기획테스트서버06
-    public static final String SERVER_DESIGN_TEST07             = "15";       // 기획테스트서버07
+    public static final String SERVER_DESIGN_TEST07             = "9";        // 기획테스트서버07
+    public static final String SERVER_DESIGN_TEST08             = "10";       // 기획테스트서버08
     public static final String SERVER_QA                        = "18";       // QA 서버 (개발DB씀)
     public static final String SERVER_DAILYQA                   = "22";       // DailyQA 서버
     public static final String SERVER_BALANCE                   = "23";       // Balance 서버
     public static final String SERVER_POLISHING                 = "28";       // 폴리싱서버
     public static final String SERVER_FREEZINGFIX               = "35";       // 프리징픽스
-    public static final String SERVER_POLISHING_DESIGN_TEST01   = "47";       // 폴리싱 기획테스트서버01
-    public static final String SERVER_POLISHING_DESIGN_TEST02   = "48";       // 폴리싱 기획테스트서버02
-    public static final String SERVER_FGT                        = "50";       // FGT서버
+    public static final String SERVER_COMPANY                   = "47";       // 전사테스트 서버
+    public static final String SERVER_FGT                       = "50";       // FGT서버
 
     public static String getIpAddress() {
 

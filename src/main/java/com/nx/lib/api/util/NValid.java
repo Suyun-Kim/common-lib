@@ -129,12 +129,21 @@ public class NValid {
         return emptyThenDefault(defaultValue);
     }
 
-    private void validate(boolean isValid) {
+    private void validate(boolean isValid, String key, String reason) {
+        String errMsg = "파라미터 검증 오류";
+        if (!isValid) {
+            errMsg += "\n[Key] : " + key;
+            errMsg += ", [Reason] : " + reason;
+        }
+        validate(isValid, errMsg);
+    }
+
+    private void validate(boolean isValid, String errMsg) {
         if (isValid) {
             logger.debug("Vaild OK");
         } else {
             logger.debug("Vaild FAIL");
-            throw new BadRequestException("4000", "파라미터 검증 오류");
+            throw new BadRequestException("4000", errMsg);
         }
     }
 
@@ -189,7 +198,7 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null && params.containsKey(k) && !"".equals(params.get(k)));
+            validate(params != null && params.containsKey(k) && !"".equals(params.get(k)), k, "값이 없거나 공백입니다.");
         }
 
         return this;
@@ -219,7 +228,7 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null && params.containsKey(k));
+            validate(params != null && params.containsKey(k), k, "값이 없습니다.");
         }
 
         return this;
@@ -251,11 +260,11 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
-            validate(params.get(k).equals(equalsValue));
+            validate(params.get(k).equals(equalsValue), k, equalsValue + "와 값이 일치해야 합니다.");
         }
         return this;
     }
@@ -286,11 +295,11 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
-            validate(!(params.get(k).equals(notEqualsValue)));
+            validate(!(params.get(k).equals(notEqualsValue)), k, notEqualsValue + "가 아닌 값이어야 합니다.");
         }
         return this;
     }
@@ -321,11 +330,11 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
-            validate(pre.test(params.get(k)));
+            validate(pre.test(params.get(k)), k, "Predicate 검증 실패.");
         }
         return this;
     }
@@ -356,7 +365,7 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
@@ -369,7 +378,7 @@ public class NValid {
                 }
             }
 
-            validate(isContain);
+            validate(isContain, k, "포함하는 값이 없습니다.");
         }
         return this;
     }
@@ -380,7 +389,7 @@ public class NValid {
      * </p>
      * <p>
      * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크<br>
-     * - Number Type이 아니면 NumberFormatException 발생
+     * - Number Type이 아니면 검증 실패
      * </p>
      * 
      * <pre>
@@ -391,7 +400,7 @@ public class NValid {
      *      .max(100);
      * 
      * </pre>
-     * @throws NumberFormatException
+     * 
      */
     public NValid max(Number maxValue) {
         checkMapAndKey();
@@ -402,7 +411,7 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
@@ -423,7 +432,7 @@ public class NValid {
             } catch (NumberFormatException e) {
                 bool = false;
             }
-            validate(bool);
+            validate(bool, k, maxValue + "값을 초과하거나 숫자 타입이 아닙니다.");
         }
         return this;
     }
@@ -434,7 +443,7 @@ public class NValid {
      * </p>
      * <p>
      * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크<br>
-     * - Number Type이 아니면 NumberFormatException 발생
+     * - Number Type이 아니면 검증 실패
      * </p>
      * 
      * <pre>
@@ -445,7 +454,7 @@ public class NValid {
      *      .min(30);
      * 
      * </pre>
-     * @throws NumberFormatException
+     * 
      */
     public NValid min(Number minValue) {
         checkMapAndKey();
@@ -456,7 +465,7 @@ public class NValid {
                     logger.debug("Skip :: {}", k);
                     return this;
                 }
-                validate(false);
+                validate(false, k, "값이 없습니다.");
                 return this;
             }
 
@@ -477,7 +486,7 @@ public class NValid {
             } catch (NumberFormatException e) {
                 bool = false;
             }
-            validate(bool);
+            validate(bool, k, minValue + "값 미만이거나 숫자 타입이 아닙니다.");
         }
         return this;
     }

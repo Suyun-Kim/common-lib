@@ -15,6 +15,37 @@ public class NValid {
     private Map<String, Object> params;
     private boolean requireMode = false;
 
+    /**
+     * <p>
+     * NValid를 초기화
+     * </p>
+     * 
+     * <pre>
+     * #Usecase
+     * 
+     * NValid.of(map)
+     *      .key("name");
+     *      
+     * NValid.of(map)
+     *      .key("name", "age");
+     * 
+     * NValid.of(map)
+     *      .requireKey("name");
+     * 
+     * NValid.of(map)
+     *      .key("name")
+     *      .eq("babo")
+     *      .key("age")
+     *      .max("30")
+     *      .min("18")
+     *      .key("skills")
+     *      .optional(obj -> {
+     *          List<Map<String,Object>> skills = (List<Map<String,Object>>) obj;
+     *          return skills.size() > 10
+     *      });
+     *
+     * </pre>
+     */
     public static NValid of(Map<String, Object> params) {
         return new NValid(params);
     }
@@ -23,23 +54,79 @@ public class NValid {
         this.params = params;
     }
 
+    /**
+     * <p>
+     * 데이터로 사용하나, 필수가 아닌 파라미터 이름을 선택
+     * </p>
+     * <p>
+     * - Arrays로 파라미터를 입력 시 동일한 검증 처리
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key("name");
+     *      
+     * #Example2
+     * 
+     * NValid.of(map)
+     *      .key("name", "age", "school" ....);
+     *
+     * </pre>
+     */
     public NValid key(String... keyName) {
         this.keyName = keyName;
         this.requireMode = false;
         return this;
     }
 
+    /**
+     * <p>
+     * 필수로 포함되어야 할 파라미터 이름을 선택
+     * </p>
+     * <p>
+     * - "" 공백의 경우 포함된 파라미터로 허용 <br>
+     * - Arrays로 파라미터를 입력 시 동일한 검증 처리
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .requireKey("name");
+     *      
+     * #Example2
+     * 
+     * NValid.of(map)
+     *      .requireKey("name", "age", "school" ....);
+     *
+     * </pre>
+     */
     public NValid requireKey(String... keyName) {
         this.keyName = keyName;
         this.requireMode = true;
-        return notEmpty();
+        return notNull();
     }
 
+    /**
+     * <p>
+     * 기본값이 필요한 파라미터의 default값을 설정
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .defaultKey("name", "park");
+     *
+     * </pre>
+     */
     public NValid defaultKey(String keyName, Object defaultValue) {
         String[] k = { keyName };
         this.keyName = k;
         this.requireMode = true;
-        return emptyDefault(defaultValue);
+        return emptyThenDefault(defaultValue);
     }
 
     private void validate(boolean isValid) {
@@ -51,7 +138,25 @@ public class NValid {
         }
     }
 
-    public NValid emptyDefault(Object defaultValue) {
+    /**
+     * <p>
+     * 파라미터의 default값을 설정
+     * </p>
+     * <p>
+     * - key() 또는 requireKey()로 key의 설정 선행 필요<br>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key("name")
+     *      .emptyThenDefault("msseol");
+     *
+     * </pre>
+     */
+    public NValid emptyThenDefault(Object defaultValue) {
         checkMapAndKey();
 
         for (String k : keyName) {
@@ -62,16 +167,81 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 파라미터가 Null 또는 공백인지 체크한다.
+     * </p>
+     * <p>
+     * - key() 또는 requireKey()로 key의 설정 선행 필요<br>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .notEmpty();
+     *
+     * </pre>
+     */
     public NValid notEmpty() {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null && params.get(k) != null);
+            validate(params != null && params.containsKey(k) && !"".equals(params.get(k)));
         }
 
         return this;
     }
 
+    /**
+     * <p>
+     * 파라미터가 Null인지 체크
+     * </p>
+     * <p>
+     * - "" 공백의 경우 포함된 파라미터로 허용<br>
+     * - requireKey() 사용 시 key() + notNull()<br>
+     * - key() 또는 requireKey()로 key의 설정 선행 필요<br>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .notNull();
+     *
+     * </pre>
+     */
+    public NValid notNull() {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            validate(params != null && params.containsKey(k));
+        }
+
+        return this;
+    }
+
+    /**
+     * <p>
+     * 파라미터가 해당하는 값과 같은 값인지 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .eq("0");
+     *
+     * </pre>
+     */
     public NValid eq(Object equalsValue) {
         checkMapAndKey();
 
@@ -90,6 +260,23 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 파라미터가 해당하는 값일 경우 검증 실패 처리
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .notEq("0");
+     *
+     * </pre>
+     */
     public NValid notEq(Object notEqualsValue) {
         checkMapAndKey();
 
@@ -108,6 +295,23 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 파라미터를 별도의 조건 Function을 통해 검증 처리
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .optional(val -> ("custom".equals(val) && "custom2".equals(val));
+     *
+     * </pre>
+     */
     public NValid optional(Predicate<Object> pre) {
         checkMapAndKey();
 
@@ -126,6 +330,23 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 파라미터를 설정된 값들에 포함되는지 체크한다.
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .in("a", "b", "c");
+     * 
+     * </pre>
+     */
     public NValid in(Object... containsValue) {
         checkMapAndKey();
 
@@ -153,6 +374,25 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 숫자형 파라미터가 최대수치 범위 내인지 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크<br>
+     * - Number Type이 아니면 NumberFormatException 발생
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .max(100);
+     * 
+     * </pre>
+     * @throws NumberFormatException
+     */
     public NValid max(Number maxValue) {
         checkMapAndKey();
 
@@ -188,6 +428,25 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * 숫자형 파라미터가 최소수치 범위 내인지 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크<br>
+     * - Number Type이 아니면 NumberFormatException 발생
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .min(30);
+     * 
+     * </pre>
+     * @throws NumberFormatException
+     */
     public NValid min(Number minValue) {
         checkMapAndKey();
 

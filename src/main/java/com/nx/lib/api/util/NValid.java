@@ -198,7 +198,11 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null && params.containsKey(k) && !"".equals(params.get(k)), k, "값이 없거나 공백입니다.");
+            validate(params != null 
+                    && params.containsKey(k) 
+                    && params.get(k) != null 
+                    && !"".equals(params.get(k)), 
+                    k, "값이 없거나 공백입니다.");
         }
 
         return this;
@@ -228,7 +232,10 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null && params.containsKey(k), k, "값이 없습니다.");
+            validate(params != null 
+                    && params.containsKey(k) 
+                    && params.get(k) != null, 
+                    k, "값이 없습니다.");
         }
 
         return this;

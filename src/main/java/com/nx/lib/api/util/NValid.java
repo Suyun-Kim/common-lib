@@ -198,11 +198,8 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null 
-                    && params.containsKey(k) 
-                    && params.get(k) != null 
-                    && !"".equals(params.get(k)), 
-                    k, "값이 없거나 공백입니다.");
+            validate(params != null && params.containsKey(k) && params.get(k) != null && !"".equals(params.get(k)), k,
+                    "값이 없거나 공백입니다.");
         }
 
         return this;
@@ -232,10 +229,7 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            validate(params != null 
-                    && params.containsKey(k) 
-                    && params.get(k) != null, 
-                    k, "값이 없습니다.");
+            validate(params != null && params.containsKey(k) && params.get(k) != null, k, "값이 없습니다.");
         }
 
         return this;
@@ -342,6 +336,43 @@ public class NValid {
             }
 
             validate(pre.test(params.get(k)), k, "Predicate 검증 실패.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
+     * 글자수 길이 체크 n~n
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .length(0, 60);
+     *
+     * </pre>
+     */
+    public NValid length(int minLen, int maxLen) {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    return this;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            String str = params.get(k).toString();
+            validate(minLen <= str.length() && str.length() <= maxLen, k,
+                    "글자 수 검증 실패.[" + minLen + " ~ " + maxLen + "]");
         }
         return this;
     }

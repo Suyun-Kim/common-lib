@@ -255,6 +255,7 @@ public class NValid {
     public NValid eq(Object equalsValue) {
         checkMapAndKey();
 
+        String target = equalsValue.toString();
         for (String k : keyName) {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
@@ -265,7 +266,8 @@ public class NValid {
                 return this;
             }
 
-            validate(params.get(k).equals(equalsValue), k, equalsValue + "와 값이 일치해야 합니다.");
+            String value = params.get(k).toString();
+            validate(value.equals(target), k, equalsValue + "와 값이 일치해야 합니다.");
         }
         return this;
     }
@@ -290,6 +292,7 @@ public class NValid {
     public NValid notEq(Object notEqualsValue) {
         checkMapAndKey();
 
+        String target = notEqualsValue.toString();
         for (String k : keyName) {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
@@ -300,7 +303,8 @@ public class NValid {
                 return this;
             }
 
-            validate(!(params.get(k).equals(notEqualsValue)), k, notEqualsValue + "가 아닌 값이어야 합니다.");
+            String value = params.get(k).toString();
+            validate(!(value.equals(target)), k, notEqualsValue + "가 아닌 값이어야 합니다.");
         }
         return this;
     }
@@ -408,9 +412,9 @@ public class NValid {
             }
 
             boolean isContain = false;
-            Object value = params.get(k);
+            String value = params.get(k).toString();
             for (Object containValue : containsValue) {
-                if (value.equals(containValue)) {
+                if (value.equals(containValue.toString())) {
                     isContain = true;
                     break;
                 }

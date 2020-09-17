@@ -26,6 +26,19 @@ public class CrossAPI {
                     "cml0ZSJdfQ.hzR1BvtxMC63gGOOM8R1a2IjNbTzb-OwD_h2rDDcL-5tTLW-z_3rYz" +
                     "0iVRrWpzz6C8JjXVB07m9JTE4W-PeOmIZj4nrgg92ExViOlfeB-1mI6TjWqU0ubQJ" +
                     "C1Hx_wgSoZDACVz5PM3HE3RBoy2JwckbIKr0phvw7P98fvgrzH3Q";
+
+    private static final String CROSS_API_TOKEN_LIVE_TMP =
+            "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTQ5NDIxNzksInVzZX" +
+                    "JfbmFtZSI6ImNyb3NzYXBpIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DT01NT05fTk8i" +
+                    "XSwianRpIjoiODVlYTNiMjMtZjE1NC00YThkLThkOGUtNjkyODc3YzE5MDE1IiwiY2" +
+                    "xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJ0cnVzdCIsInJlYWQiLCJ3cml0" +
+                    "ZSJdfQ.IBDQ4vYYnd92qmupnitDorqO-B3HJlY82aH92q6fyOw9MbzhkFWOIz3w1jP" +
+                    "P4pe1cPHGx5Nm_hfgmlyQTpl0IVsjX55yqn7jUMBMTb0W09c3goe9DNebIpQXPzXIh" +
+                    "-paSTCW40ZXyZGaG5W9bbEwtoek0kLaDEXmjYV1t9iK17ZKws5acEDxri_0YLWKCOZ" +
+                    "oDcg9UCUs2TSEwXbqVSfvEbTdvx6x_BlhG_zX4dRTjhgPQ-z9NyGRa0r8uM-5qPzxM" +
+                    "OXkzEdYu-BiSb-bgBmiOLT5MOLOWJNEKvXIQbNX35lz3iTEm1IF3BHwG3K8KfGkKUI" +
+                    "NMxIMcLjyFxXk0YDHsQ";
+
     private final ObjectMapper objectMapper;
 
     public CrossAPI(
@@ -60,6 +73,41 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", CROSS_API_TOKEN);
+        HttpEntity requestEntity =  new HttpEntity("parameters", headers);
+
+        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
+
+        int httpStatus = res.getStatusCodeValue();
+
+        if (httpStatus != 200) {
+            return new HashMap<>();
+        }
+
+        return res.getBody().get("result");
+    }
+
+    public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
+
+        RestTemplate rt = new RestTemplate();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
+            params.add(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
+                .queryParams(params).build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
+        } else {
+            headers.set("Authorization", CROSS_API_TOKEN);
+        }
         HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
@@ -108,6 +156,35 @@ public class CrossAPI {
         return res.getStatusCode();
     }
 
+    public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
+        RestTemplate rt = new RestTemplate();
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
+                + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
+        } else {
+            headers.set("Authorization", CROSS_API_TOKEN);
+        }
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
+        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
+
+        return res.getStatusCode();
+    }
+
     public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap) {
         RestTemplate rt = new RestTemplate();
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
@@ -119,6 +196,35 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", CROSS_API_TOKEN);
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
+        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
+
+        return res.getStatusCode();
+    }
+
+    public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
+        RestTemplate rt = new RestTemplate();
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
+                + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
+        } else {
+            headers.set("Authorization", CROSS_API_TOKEN);
+        }
 
         String bodyStr = "";
         try {
@@ -151,6 +257,41 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", CROSS_API_TOKEN);
+        HttpEntity requestEntity =  new HttpEntity("parameters", headers);
+
+        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
+
+        int httpStatus = res.getStatusCodeValue();
+
+        if (httpStatus != 200) {
+            return new HashMap<>();
+        }
+
+        return res.getBody().get("result");
+    }
+
+    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
+
+        RestTemplate rt = new RestTemplate();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
+            params.add(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
+
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
+                .queryParams(params).build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
+        } else {
+            headers.set("Authorization", CROSS_API_TOKEN);
+        }
         HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);

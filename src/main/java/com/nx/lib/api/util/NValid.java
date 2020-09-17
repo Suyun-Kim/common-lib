@@ -169,7 +169,7 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            if (!params.containsKey(k)) {
+            if (!params.containsKey(k) || "".equals(params.get(k)) || params.get(k) == null) {
                 params.put(k, defaultValue);
             }
         }
@@ -529,6 +529,37 @@ public class NValid {
                 bool = false;
             }
             validate(bool, k, minValue + "값 미만이거나 숫자 타입이 아닙니다.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
+     * 해당 키/값에 대해 조건부로 값 변경, 조건에 맞을 경우 대체값으로 변경됨
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 적용<br>
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .replace(value -> true, replaceValue);
+     * 
+     * </pre>
+     * 
+     */
+    public NValid replace(Predicate<Object> condition, Object replaceValue) {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (params.containsKey(k) && params.get(k) != null) {
+                if(condition.test(params.get(k))){
+                    params.put(k, replaceValue);
+                }
+            }
         }
         return this;
     }

@@ -103,7 +103,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+        if (env != null && (env.equals("production") || env.equals("cbt"))) {
             headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
         } else {
             headers.set("Authorization", CROSS_API_TOKEN);
@@ -166,7 +166,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+        if (env != null && (env.equals("production") || env.equals("cbt"))) {
             headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
         } else {
             headers.set("Authorization", CROSS_API_TOKEN);
@@ -220,7 +220,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+        if (env != null && (env.equals("production") || env.equals("cbt"))) {
             headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
         } else {
             headers.set("Authorization", CROSS_API_TOKEN);
@@ -287,7 +287,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("live") || env.equals("cbt"))) {
+        if (env != null && (env.equals("production") || env.equals("cbt"))) {
             headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
         } else {
             headers.set("Authorization", CROSS_API_TOKEN);

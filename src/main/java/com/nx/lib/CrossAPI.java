@@ -44,12 +44,20 @@ public class CrossAPI {
                     "NMxIMcLjyFxXk0YDHsQ";
 
     private final ObjectMapper objectMapper;
+    private final RestTemplate rt;
+    private final String systemProfiles;
 
     public CrossAPI(
             DiscoveryClient discoveryClient
     ) {
         this.discoveryClient = discoveryClient;
-        objectMapper = new ObjectMapper();
+        this.systemProfiles = System.getProperty("spring.profiles.active");
+        this.objectMapper = new ObjectMapper();
+        this.rt = new RestTemplate();
+    }
+
+    public String getProfile() {
+        return (this.systemProfiles == null) ? "default" : this.systemProfiles;
     }
 
     public Object getCall(String serviceId, String urlParam) {
@@ -64,9 +72,9 @@ public class CrossAPI {
         return getCall(serviceId, urlParam, queryParams, null);
     }
 
-    public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
+    public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams, String customEnv) {
+        String env = (customEnv == null) ? getProfile() : customEnv;
 
-        RestTemplate rt = new RestTemplate();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
             params.add(entry.getKey(), String.valueOf(entry.getValue()));
@@ -81,11 +89,8 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("production") || env.equals("cbt"))) {
-            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
-        } else {
-            headers.set("Authorization", CROSS_API_TOKEN);
-        }
+        headers.set("Authorization", authorizationToken(env));
+
         HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
@@ -93,7 +98,7 @@ public class CrossAPI {
         int httpStatus = res.getStatusCodeValue();
 
         if (httpStatus != 200) {
-            logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, httpStatus); // Get은 에러만 로깅
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, httpStatus); // Get은 에러만 로깅
             return new HashMap<>();
         }
 
@@ -104,8 +109,9 @@ public class CrossAPI {
         return postCall(serviceId, urlParam, bodyMap, null);
     }
 
-    public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
-        RestTemplate rt = new RestTemplate();
+    public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap, String customEnv) {
+        String env = (customEnv == null) ? getProfile() : customEnv;
+
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
 
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
@@ -114,11 +120,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("production") || env.equals("cbt"))) {
-            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
-        } else {
-            headers.set("Authorization", CROSS_API_TOKEN);
-        }
+        headers.set("Authorization", authorizationToken(env));
 
         String bodyStr = "";
         try {
@@ -130,7 +132,7 @@ public class CrossAPI {
         HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
         ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
 
-        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
+        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
         return res.getStatusCode();
     }
 
@@ -138,8 +140,9 @@ public class CrossAPI {
         return putCall(serviceId, urlParam, bodyMap, null);
     }
 
-    public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
-        RestTemplate rt = new RestTemplate();
+    public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap, String customEnv) {
+        String env = (customEnv == null) ? getProfile() : customEnv;
+
         List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
 
         ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
@@ -148,11 +151,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("production") || env.equals("cbt"))) {
-            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
-        } else {
-            headers.set("Authorization", CROSS_API_TOKEN);
-        }
+        headers.set("Authorization", authorizationToken(env));
 
         String bodyStr = "";
         try {
@@ -164,7 +163,7 @@ public class CrossAPI {
         HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
         ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
 
-        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
+        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
         return res.getStatusCode();
     }
 
@@ -172,9 +171,9 @@ public class CrossAPI {
         return deleteCall(serviceId, urlParam, queryParams, null);
     }
 
-    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
+    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams, String customEnv) {
+        String env = (customEnv == null) ? getProfile() : customEnv;
 
-        RestTemplate rt = new RestTemplate();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
             params.add(entry.getKey(), String.valueOf(entry.getValue()));
@@ -189,11 +188,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if (env != null && (env.equals("production") || env.equals("cbt"))) {
-            headers.set("Authorization", CROSS_API_TOKEN_LIVE_TMP);
-        } else {
-            headers.set("Authorization", CROSS_API_TOKEN);
-        }
+        headers.set("Authorization", authorizationToken(env));
         HttpEntity requestEntity =  new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
@@ -204,8 +199,11 @@ public class CrossAPI {
             return new HashMap<>();
         }
 
-        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
+        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
         return res.getBody().get("result");
     }
 
+    private String authorizationToken(String env) {
+        return (env != null && (env.equals("production") || env.equals("cbt"))) ? CROSS_API_TOKEN_LIVE_TMP : CROSS_API_TOKEN;
+    }
 }

@@ -1,6 +1,9 @@
 package com.nx.lib;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.*;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CrossAPI {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private DiscoveryClient discoveryClient;
     private static final String CROSS_API_TOKEN =
@@ -48,42 +52,16 @@ public class CrossAPI {
         objectMapper = new ObjectMapper();
     }
 
-    /**
-     * CrossAPI Get 요청
-     * @param serviceId
-     * @param urlParam
-     * @param queryParams
-     * @return
-     */
+    public Object getCall(String serviceId, String urlParam) {
+        return getCall(serviceId, urlParam, new HashMap<>(), null);
+    }
+
+    public Object getCall(String serviceId, String urlParam, String env) {
+        return getCall(serviceId, urlParam, new HashMap<>(), env);
+    }
+
     public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
-
-        RestTemplate rt = new RestTemplate();
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
-            params.add(entry.getKey(), String.valueOf(entry.getValue()));
-        }
-
-        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
-        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
-                .queryParams(params).build();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", CROSS_API_TOKEN);
-        HttpEntity requestEntity =  new HttpEntity("parameters", headers);
-
-        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
-
-        int httpStatus = res.getStatusCodeValue();
-
-        if (httpStatus != 200) {
-            return new HashMap<>();
-        }
-
-        return res.getBody().get("result");
+        return getCall(serviceId, urlParam, queryParams, null);
     }
 
     public Object getCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
@@ -115,45 +93,15 @@ public class CrossAPI {
         int httpStatus = res.getStatusCodeValue();
 
         if (httpStatus != 200) {
+            logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, httpStatus); // Get은 에러만 로깅
             return new HashMap<>();
         }
 
         return res.getBody().get("result");
     }
 
-    /**
-     * CrossAPI GET 요청
-     * @param serviceId
-     * @param urlParam
-     * @return
-     */
-    public Object getCall(String serviceId, String urlParam) {
-        return this.getCall(serviceId, urlParam, new HashMap<>());
-    }
-
     public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap) {
-        RestTemplate rt = new RestTemplate();
-        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
-
-        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
-                + urlParam;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", CROSS_API_TOKEN);
-
-        String bodyStr = "";
-        try {
-            bodyStr = objectMapper.writeValueAsString(bodyMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
-
-        return res.getStatusCode();
+        return postCall(serviceId, urlParam, bodyMap, null);
     }
 
     public HttpStatus postCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
@@ -182,32 +130,12 @@ public class CrossAPI {
         HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
         ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
 
+        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
         return res.getStatusCode();
     }
 
     public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap) {
-        RestTemplate rt = new RestTemplate();
-        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
-
-        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort()
-                + urlParam;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", CROSS_API_TOKEN);
-
-        String bodyStr = "";
-        try {
-            bodyStr = objectMapper.writeValueAsString(bodyMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
-
-        return res.getStatusCode();
+        return putCall(serviceId, urlParam, bodyMap, null);
     }
 
     public HttpStatus putCall(String serviceId, String urlParam, HashMap bodyMap, String env) {
@@ -236,38 +164,12 @@ public class CrossAPI {
         HttpEntity requestEntity =  new HttpEntity(bodyStr, headers);
         ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
 
+        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
         return res.getStatusCode();
     }
 
     public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
-
-        RestTemplate rt = new RestTemplate();
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
-            params.add(entry.getKey(), String.valueOf(entry.getValue()));
-        }
-
-        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
-        ServiceInstance serviceInstance = list.get(0); //로드밸런스 관련 설정이 필요하다면 이곳을..
-
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme("http").host(serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam)
-                .queryParams(params).build();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", CROSS_API_TOKEN);
-        HttpEntity requestEntity =  new HttpEntity("parameters", headers);
-
-        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
-
-        int httpStatus = res.getStatusCodeValue();
-
-        if (httpStatus != 200) {
-            return new HashMap<>();
-        }
-
-        return res.getBody().get("result");
+        return deleteCall(serviceId, urlParam, queryParams, null);
     }
 
     public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams, String env) {
@@ -302,6 +204,7 @@ public class CrossAPI {
             return new HashMap<>();
         }
 
+        logger.info("[CrossAPI Response] Url [{}] Response [{}]", urlParam, res.getStatusCode());
         return res.getBody().get("result");
     }
 

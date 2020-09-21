@@ -444,7 +444,7 @@ public class NValid {
      * </pre>
      * 
      */
-    public NValid max(Number maxValue) {
+    public NValid max(int maxValue) {
         checkMapAndKey();
 
         for (String k : keyName) {
@@ -459,22 +459,11 @@ public class NValid {
 
             boolean bool = true;
             try {
-                Object value = params.get(k);
-                if (value instanceof Integer) {
-                    bool = Integer.parseInt(maxValue.toString()) >= Integer.parseInt(params.get(k).toString());
-                } else if (value instanceof Long) {
-                    bool = Long.parseLong(maxValue.toString()) >= Long.parseLong(params.get(k).toString());
-                }
-                if (value instanceof Double) {
-                    bool = Double.parseDouble(maxValue.toString()) >= Double.parseDouble(params.get(k).toString());
-                }
-                if (value instanceof Float) {
-                    bool = Float.parseFloat(maxValue.toString()) >= Float.parseFloat(params.get(k).toString());
-                }
+                bool = maxValue >= Integer.parseInt(params.get(k).toString());
             } catch (NumberFormatException e) {
                 bool = false;
             }
-            validate(bool, k, maxValue + "값을 초과하거나 숫자 타입이 아닙니다.");
+            validate(bool, k, maxValue + "값을 초과하거나 정수 타입이 아닙니다.");
         }
         return this;
     }
@@ -498,7 +487,7 @@ public class NValid {
      * </pre>
      * 
      */
-    public NValid min(Number minValue) {
+    public NValid min(int minValue) {
         checkMapAndKey();
 
         for (String k : keyName) {
@@ -513,18 +502,7 @@ public class NValid {
 
             boolean bool = true;
             try {
-                Object value = params.get(k);
-                if (value instanceof Integer) {
-                    bool = Integer.parseInt(minValue.toString()) <= Integer.parseInt(params.get(k).toString());
-                } else if (value instanceof Long) {
-                    bool = Long.parseLong(minValue.toString()) <= Long.parseLong(params.get(k).toString());
-                }
-                if (value instanceof Double) {
-                    bool = Double.parseDouble(minValue.toString()) <= Double.parseDouble(params.get(k).toString());
-                }
-                if (value instanceof Float) {
-                    bool = Float.parseFloat(minValue.toString()) <= Float.parseFloat(params.get(k).toString());
-                }
+                bool = minValue <= Integer.parseInt(params.get(k).toString());
             } catch (NumberFormatException e) {
                 bool = false;
             }

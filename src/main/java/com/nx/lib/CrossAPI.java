@@ -29,7 +29,7 @@ public class CrossAPI {
     private DiscoveryClient discoveryClient;
 
     // TODO 전부 바꾼 후 제거
-    private final String CROSS_API_TOKEN = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTc4NzM1NjksInVzZ"
+    private final String CROSS_API_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTc4NzM1NjksInVzZ"
             + "XJfbmFtZSI6ImNyb3NzYXBpIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DT01NT05fTk"
             + "8iXSwianRpIjoiMjk3ZTEyZmUtOTUzYi00M2RkLWE5MTctM2Y5YzFmOGY0MzMxIiw"
             + "iY2xpZW50X2lkIjoicGxhdGZvcm0iLCJzY29wZSI6WyJ0cnVzdCIsInJlYWQiLCJ3"
@@ -38,7 +38,7 @@ public class CrossAPI {
             + "C1Hx_wgSoZDACVz5PM3HE3RBoy2JwckbIKr0phvw7P98fvgrzH3Q";
 
     // TODO 전부 바꾼 후 제거
-    private final String CROSS_API_TOKEN_LIVE_TMP = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTQ5NDIxNzksInVzZX"
+    private final String CROSS_API_TOKEN_LIVE_TMP = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTQ5NDIxNzksInVzZX"
             + "JfbmFtZSI6ImNyb3NzYXBpIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DT01NT05fTk8i"
             + "XSwianRpIjoiODVlYTNiMjMtZjE1NC00YThkLThkOGUtNjkyODc3YzE5MDE1IiwiY2"
             + "xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJ0cnVzdCIsInJlYWQiLCJ3cml0"
@@ -108,7 +108,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization","Bearer " +  token);
 
         HttpEntity requestEntity = new HttpEntity("parameters", headers);
 
@@ -147,7 +147,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization","Bearer " + token);
 
         String bodyStr = "";
         try {
@@ -185,7 +185,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization","Bearer " +  token);
 
         String bodyStr = "";
         try {
@@ -233,7 +233,7 @@ public class CrossAPI {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization","Bearer " +  token);
         HttpEntity requestEntity = new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);

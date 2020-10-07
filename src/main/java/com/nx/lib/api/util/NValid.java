@@ -260,7 +260,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -297,7 +297,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -333,7 +333,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -368,7 +368,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -405,7 +405,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -451,7 +451,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
@@ -494,7 +494,7 @@ public class NValid {
             if (!params.containsKey(k)) {
                 if (!requireMode) {
                     logger.debug("Skip :: {}", k);
-                    return this;
+                    continue;
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;

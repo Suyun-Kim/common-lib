@@ -130,20 +130,11 @@ public class NValid {
     }
 
     private void validate(boolean isValid, String key, String reason) {
-        String errMsg = "파라미터 검증 오류";
         if (!isValid) {
-            errMsg += "\n[Key] : " + key;
-            errMsg += ", [Reason] : " + reason;
-        }
-        validate(isValid, errMsg);
-    }
-
-    private void validate(boolean isValid, String errMsg) {
-        if (isValid) {
-            logger.debug("Vaild OK");
+            logger.error("Vaild FAIL");
+            throw new BadRequestException("4000", "파라미터 검증 오류\n[Key] : " + key + ", [Reason] : " + reason);
         } else {
-            logger.debug("Vaild FAIL");
-            throw new BadRequestException("4000", errMsg);
+            logger.debug("Vaild OK");
         }
     }
 
@@ -534,7 +525,7 @@ public class NValid {
 
         for (String k : keyName) {
             if (params.containsKey(k) && params.get(k) != null) {
-                if(condition.test(params.get(k))){
+                if (condition.test(params.get(k))) {
                     params.put(k, replaceValue);
                 }
             }

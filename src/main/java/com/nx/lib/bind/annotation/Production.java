@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
-@ConditionalOnExpression("'${spring.profiles.active}' == 'production'")
+@ConditionalOnExpression("'${spring.profiles.active:default}' == 'production'")
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Production {

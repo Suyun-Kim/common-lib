@@ -1,5 +1,6 @@
 package com.nx.lib.api.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -498,6 +499,52 @@ public class NValid {
                 bool = false;
             }
             validate(bool, k, minValue + "값 미만이거나 숫자 타입이 아닙니다.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
+     * 파라미터가 해당하는 Date 포맷인지 조회
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .date("0");
+     *
+     * </pre>
+     */
+    public NValid date(String strFormat) {
+        checkMapAndKey();
+
+        SimpleDateFormat sdf = new SimpleDateFormat(strFormat);
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    continue;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            boolean valid = true;
+            String dateStr = params.get(k).toString();
+            sdf.setLenient(false);
+
+            try {
+                sdf.parse(dateStr);
+            } catch (Exception e) {
+                valid = false;
+            }
+
+            validate(valid, k, "날짜 형식(" + strFormat + ")이 아닙니다.");
         }
         return this;
     }

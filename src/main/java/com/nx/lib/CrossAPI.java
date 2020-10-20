@@ -50,7 +50,7 @@ public class CrossAPI {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate rt;
-    private final String systemProfiles; // TODO 전부 바꾼 후 제거
+    private final String systemProfiles;
 
     public CrossAPI(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
@@ -59,7 +59,6 @@ public class CrossAPI {
         this.rt = new RestTemplate();
     }
 
-    @Deprecated
     public String getProfile() {
         return (this.systemProfiles == null) ? "default" : this.systemProfiles;
     }

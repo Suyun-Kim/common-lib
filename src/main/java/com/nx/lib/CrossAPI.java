@@ -210,16 +210,16 @@ public class CrossAPI {
 
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
     @Deprecated
-    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
+    public HttpStatus deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams) {
         return deleteCallWithAuthorization(serviceId, urlParam, queryParams, null);
     }
 
-    public Object deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams,
+    public HttpStatus deleteCall(String serviceId, String urlParam, Map<String, Object> queryParams,
             String authorizationToken) {
         return deleteCallWithAuthorization(serviceId, urlParam, queryParams, authorizationToken);
     }
 
-    private Object deleteCallWithAuthorization(String serviceId, String urlParam, Map<String, Object> queryParams,
+    private HttpStatus deleteCallWithAuthorization(String serviceId, String urlParam, Map<String, Object> queryParams,
             String authorizationToken) {
         String token = (authorizationToken != null) ? authorizationToken : authorizationToken();
 
@@ -241,24 +241,17 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
-        HttpEntity requestEntity = new HttpEntity("parameters", headers);
 
         ResponseEntity<Map> res = null;
-        int httpStatus = 200;
+        HttpEntity requestEntity = new HttpEntity("parameters", headers);
         try {
             res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
             logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
             return res.getStatusCode();
         } catch (HttpStatusCodeException e) {
             logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
-            httpStatus = e.getRawStatusCode();
+            return e.getStatusCode();
         }
-
-        if (httpStatus != 200) {
-            return Collections.emptyMap();
-        }
-
-        return (res != null) ? res.getBody().get("result") : Collections.emptyMap();
     }
 
     // TODO 전부 바꾼 후 제거

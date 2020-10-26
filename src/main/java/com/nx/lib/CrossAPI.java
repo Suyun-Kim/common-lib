@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -111,17 +112,16 @@ public class CrossAPI {
 
         HttpEntity requestEntity = new HttpEntity("parameters", headers);
 
-        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
-
-        int httpStatus = res.getStatusCodeValue();
-
-        if (httpStatus != 200) {
-            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, httpStatus); // Get은
-                                                                                                              // 에러만 로깅
+        ResponseEntity<Map> res = null;
+        try {
+            res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
             return Collections.emptyMap();
         }
 
-        return res.getBody().get("result");
+        return (res == null) ? Collections.emptyMap() : res.getBody().get("result");
     }
 
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
@@ -156,10 +156,14 @@ public class CrossAPI {
         }
 
         HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
-
-        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
-        return res.getStatusCode();
+        try {
+            ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+            return res.getStatusCode();
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+            return e.getStatusCode();
+        }
     }
 
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
@@ -194,10 +198,14 @@ public class CrossAPI {
         }
 
         HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
-        ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
-
-        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
-        return res.getStatusCode();
+        try {
+            ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+            return res.getStatusCode();
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+            return e.getStatusCode();
+        }
     }
 
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
@@ -235,16 +243,22 @@ public class CrossAPI {
         headers.set("Authorization", bearer(token));
         HttpEntity requestEntity = new HttpEntity("parameters", headers);
 
-        ResponseEntity<Map> res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
-
-        int httpStatus = res.getStatusCodeValue();
+        ResponseEntity<Map> res = null;
+        int httpStatus = 200;
+        try {
+            res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+            return res.getStatusCode();
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+            httpStatus = e.getRawStatusCode();
+        }
 
         if (httpStatus != 200) {
             return Collections.emptyMap();
         }
 
-        logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
-        return res.getBody().get("result");
+        return (res != null) ? res.getBody().get("result") : Collections.emptyMap();
     }
 
     // TODO 전부 바꾼 후 제거

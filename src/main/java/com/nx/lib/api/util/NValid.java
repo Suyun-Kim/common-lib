@@ -134,8 +134,6 @@ public class NValid {
         if (!isValid) {
             logger.error("Vaild FAIL");
             throw new BadRequestException("4000", "파라미터 검증 오류\n[Key] : " + key + ", [Reason] : " + reason);
-        } else {
-            logger.debug("Vaild OK");
         }
     }
 
@@ -505,6 +503,53 @@ public class NValid {
 
     /**
      * <p>
+     * 숫자형 파라미터가 범위 내인지 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크<br>
+     * - Number Type이 아니면 검증 실패
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .between(1,30);
+     * 
+     * </pre>
+     * 
+     */
+    public NValid between(int minValue, int maxValue) {
+        if (minValue >= maxValue) {
+            return this;
+        }
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    continue;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            boolean bool = true;
+            try {
+                int val = Integer.parseInt(params.get(k).toString());
+                bool = minValue <= val && maxValue >= val;
+            } catch (NumberFormatException e) {
+                bool = false;
+            }
+            validate(bool, k, minValue + "~" + maxValue + " 사이 값이 아니거나 숫자 타입이 아닙니다.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
      * 파라미터가 해당하는 Date 포맷인지 조회
      * </p>
      * <p>
@@ -580,9 +625,63 @@ public class NValid {
         return this;
     }
 
+    /**
+     * <p>
+     * Integer 값인 키들에 대해 Order순인지 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 적용<br>
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey1, mapKey2, mapKey3)
+     *      .compareOrder(Order.ASC);
+     * 
+     * </pre>
+     * 
+     */
+    public NValid compareOrder(Order order) {
+        checkMapAndKey();
+        Integer beforeValue = null;
+        for (String k : keyName) {
+            try {
+                if (params.containsKey(k) && params.get(k) != null) {
+                    int value = Integer.parseInt(params.get(k).toString());
+                    if (beforeValue == null) {
+                        beforeValue = value;
+                        continue;
+                    }
+
+                    if (order == Order.ASC) {
+                        if (beforeValue > value) {
+                            validate(false, k, k + " << 이전 키값보다 더 작습니다. ");
+                        }
+                    } else if (order == Order.DESC) {
+                        if (beforeValue < value) {
+                            validate(false, k, k + " << 이전 키값보다 더 큽니다. ");
+                        }
+                    }
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                validate(false, k, "숫자 형식(" + params.get(k) + ")이 아닙니다.");
+                return this;
+            }
+        }
+
+        return this;
+    }
+
     private void checkMapAndKey() {
         if (params == null || keyName == null) {
             throw new UnsupportedOperationException("The key is required.");
         }
+    }
+
+    public enum Order {
+        ASC, DESC
     }
 }

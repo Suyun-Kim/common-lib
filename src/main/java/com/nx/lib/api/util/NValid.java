@@ -616,10 +616,8 @@ public class NValid {
         checkMapAndKey();
 
         for (String k : keyName) {
-            if (params.containsKey(k) && params.get(k) != null) {
-                if (condition.test(params.get(k))) {
-                    params.put(k, replaceValue);
-                }
+            if (condition.test(params.get(k))) {
+                params.put(k, replaceValue);
             }
         }
         return this;

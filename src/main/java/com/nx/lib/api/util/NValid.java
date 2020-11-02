@@ -113,7 +113,10 @@ public class NValid {
 
     /**
      * <p>
-     * 기본값이 필요한 파라미터의 default값을 설정
+     * 비어있는 Key일 경우 Value 넣어줌
+     * </p>
+     * <p>
+     * put, putIfEmpty 로 대체한다.
      * </p>
      * 
      * <pre>
@@ -121,14 +124,61 @@ public class NValid {
      * 
      * NValid.of(map)
      *      .defaultKey("name", "park");
+     * 
+     * </pre>
+     */
+    @Deprecated
+    public NValid defaultKey(String keyName, Object defaultValue) {
+        checkMap();
+
+        if (!params.containsKey(keyName) || "".equals(params.get(keyName)) || params.get(keyName) == null) {
+            params.put(keyName, defaultValue);
+        }
+
+        return this;
+    }
+
+    /**
+     * <p>
+     * 비어있는 Key일 경우 Value 넣어줌
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .putIfEmpty("name", "park");
      *
      * </pre>
      */
-    public NValid defaultKey(String keyName, Object defaultValue) {
-        String[] k = { keyName };
-        this.keyName = k;
-        this.requireMode = true;
-        return emptyThenDefault(defaultValue);
+    public NValid putIfEmpty(String keyName, Object value) {
+        checkMap();
+
+        if (!params.containsKey(keyName) || "".equals(params.get(keyName)) || params.get(keyName) == null) {
+            params.put(keyName, value);
+        }
+
+        return this;
+    }
+
+    /**
+     * <p>
+     * Key에 Value 강제로 넣어줌
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .put("name", "park");
+     *
+     * </pre>
+     */
+    public NValid put(String keyName, Object value) {
+        checkMap();
+
+        params.put(keyName, value);
+        return this;
     }
 
     private void validate(boolean isValid, String key, String reason) {
@@ -703,6 +753,12 @@ public class NValid {
         }
 
         return this;
+    }
+
+    private void checkMap() {
+        if (params == null) {
+            throw new UnsupportedOperationException("The params map is required.");
+        }
     }
 
     private void checkMapAndKey() {

@@ -677,6 +677,9 @@ public class NValid {
             try {
                 if (params.containsKey(k) && params.get(k) != null) {
                     int value = Integer.parseInt(params.get(k).toString());
+                    if (value == 0) {
+                        continue; // 0 인 값 무시
+                    }
                     if (beforeValue == null) {
                         beforeValue = value;
                         continue;

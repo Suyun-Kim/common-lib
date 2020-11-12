@@ -188,6 +188,13 @@ public class NValid {
         }
     }
 
+    private void validate(boolean isValid, String reason) {
+        if (!isValid) {
+            logger.error("Vaild FAIL");
+            throw new BadRequestException("4000", "파라미터 검증 오류\n [Reason] : " + reason);
+        }
+    }
+
     /**
      * <p>
      * 파라미터의 default값을 설정
@@ -352,9 +359,10 @@ public class NValid {
 
     /**
      * <p>
-     * 파라미터를 별도의 조건 Function을 통해 검증 처리
+     * Param을 커스텀한 조건에 따라 검증
      * </p>
      * <p>
+     * - 값에 대해 복잡하게 검증할 때 사용<br>
      * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
      * </p>
      * 
@@ -382,6 +390,37 @@ public class NValid {
 
             validate(pre.test(params.get(k)), k, "Predicate 검증 실패.");
         }
+        return this;
+    }
+
+    /**
+     * <p>
+     * Param Map을 커스텀한 조건에 따라 검증
+     * </p>
+     * <p>
+     * - Map 자체를 복잡하게 검증할 때 사용<br>
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .optionalMap(map -> (Boolean.valueOf(map.get("b1")) && Boolean.valueOf(map.get("b2"))));
+     * 
+     * </pre>
+     * 
+     */
+    public NValid optionalMap(Predicate<Map<String, Object>> paramMapPredicate) {
+        checkMap();
+
+        boolean valid = true;
+        try {
+            valid = paramMapPredicate.test(params);
+        } catch (Exception e) {
+            valid = false;
+        }
+
+        validate(valid, "검증 로직 실패");
         return this;
     }
 

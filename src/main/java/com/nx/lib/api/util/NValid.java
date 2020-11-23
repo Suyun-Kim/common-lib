@@ -2,6 +2,7 @@ package com.nx.lib.api.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -413,12 +414,7 @@ public class NValid {
     public NValid optionalMap(Predicate<Map<String, Object>> paramMapPredicate) {
         checkMap();
 
-        boolean valid = true;
-        try {
-            valid = paramMapPredicate.test(params);
-        } catch (Exception e) {
-            valid = false;
-        }
+        boolean valid = paramMapPredicate.test(params);
 
         validate(valid, "검증 로직 실패");
         return this;

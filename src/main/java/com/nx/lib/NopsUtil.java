@@ -47,6 +47,8 @@ public class NopsUtil {
     public static final String SERVER_COMPANY                   = "47";       // 전사테스트 서버
     public static final String SERVER_FGT                       = "50";       // FGT서버
 
+    public static final RestTemplate restTemplate = new RestTemplate();
+
     public static String getIpAddress() {
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -251,30 +253,31 @@ public class NopsUtil {
 
     public static boolean sendNotificationSlackTarget(String content, String target) {
         String recipients = "\"" + target + "\"";
-        return sendNotifications(content, "","black",recipients);
+        return sendNotifications(null, content, "","black",recipients);
     }
 
     public static boolean sendNotificationChannel(String content, String channel) {
         String recipients = "\"#" + channel + "\"";
-        return sendNotifications(content, "","black",recipients);
+        return sendNotifications(null, content, "","black",recipients);
     }
 
     public static boolean sendNotificationUser(String content, String user) {
         String recipients = "\"@" + user + "\"";
-        return sendNotifications(content, "","black",recipients);
+        return sendNotifications(null, content, "","black",recipients);
     }
 
     public static boolean sendNotificationUsers(String content, List<String> userList) {
         String recipients = String.join("\",\"@", userList);
         recipients = "\"@" + recipients + "\"";
-        return sendNotifications(content, "","black",recipients);
+        return sendNotifications(null, content, "","black",recipients);
     }
 
-    public static boolean sendNotifications(String content, String attachments, String color, String recipients) {
+    public static boolean sendNotifications(String host, String content, String attachments, 
+            String color, String recipients) {
 
         try {
-            // noti API 호출할 url 생성
-            final String notiUrl = "http://noti.npixel.co.kr/api/notification/v1.0/send";
+            String _host = (host == null) ? "http://noti.npixel.co.kr" : host;
+            final String notiUrl = _host + "/api/notification/v1.0/send";
 
             HttpHeaders headers = new HttpHeaders();
             Charset utf8 = Charset.forName("UTF-8");
@@ -296,8 +299,6 @@ public class NopsUtil {
 
             HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-            // API 호출을 위한 RestTemplate 인스턴스 생성
-            RestTemplate restTemplate = new RestTemplate();
             restTemplate.postForObject(notiUrl, entity, String.class);
 
         } catch (Exception e) {

@@ -166,6 +166,42 @@ public class CrossAPI {
         }
     }
 
+    public ResponseEntity<Map> postResponseCall(String serviceId, String urlParam, Map<String, Object> bodyMap,
+                               String authorizationToken) {
+        return postResponseCallWithAuthorization(serviceId, urlParam, bodyMap, authorizationToken);
+    }
+
+    private ResponseEntity<Map> postResponseCallWithAuthorization(String serviceId, String urlParam, Map<String, Object> bodyMap,
+                                                 String authorizationToken) {
+        String token = (authorizationToken != null) ? authorizationToken : authorizationToken();
+
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); // 로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", bearer(token));
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
+        try {
+            ResponseEntity<Map> res = rt.exchange(url, HttpMethod.POST, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+            return res;
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+    }
+
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
     @Deprecated
     public HttpStatus putCall(String serviceId, String urlParam, Map<String, Object> bodyMap) {
@@ -207,6 +243,43 @@ public class CrossAPI {
             return e.getStatusCode();
         }
     }
+
+    public ResponseEntity<Map> putResponseCall(String serviceId, String urlParam, Map<String, Object> bodyMap,
+                              String authorizationToken) {
+        return putResponseCallWithAuthorization(serviceId, urlParam, bodyMap, authorizationToken);
+    }
+
+    private ResponseEntity<Map> putResponseCallWithAuthorization(String serviceId, String urlParam, Map<String, Object> bodyMap,
+                                                String authorizationToken) {
+        String token = (authorizationToken != null) ? authorizationToken : authorizationToken();
+
+        List<ServiceInstance> list = discoveryClient.getInstances(serviceId);
+
+        ServiceInstance serviceInstance = list.get(0); // 로드밸런스 관련 설정이 필요하다면 이곳을..
+        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + urlParam;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", bearer(token));
+
+        String bodyStr = "";
+        try {
+            bodyStr = objectMapper.writeValueAsString(bodyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
+        try {
+            ResponseEntity<Map> res = rt.exchange(url, HttpMethod.PUT, requestEntity, Map.class);
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
+            return res;
+        } catch (HttpStatusCodeException e) {
+            logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+    }
+
 
     // TODO 기존 호환용 추후 제거 ( Authorization을 무조건 받도록 해야함 )
     @Deprecated

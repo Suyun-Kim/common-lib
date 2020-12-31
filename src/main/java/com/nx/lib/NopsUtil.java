@@ -29,25 +29,39 @@ import com.nx.lib.exception.BaseException;
 
 public class NopsUtil {
 
-    public static final String SERVER_FREEZING                  = "1";        // 프리징 서버
-    public static final String SERVER_DEV                       = "2";        // 개발서버
-    public static final String SERVER_DESIGN_TEST01             = "4";        // 기획테스트서버01
-    public static final String SERVER_DESIGN_TEST02             = "5";        // 기획테스트서버02
-    public static final String SERVER_DESIGN_TEST03             = "6";        // 기획테스트서버03
-    public static final String SERVER_DESIGN_TEST04             = "7";        // 기획테스트서버04
-    public static final String SERVER_DESIGN_TEST05             = "8";        // 기획테스트서버05
-    public static final String SERVER_DESIGN_TEST06             = "3";        // 기획테스트서버06
-    public static final String SERVER_DESIGN_TEST07             = "9";        // 기획테스트서버07
-    public static final String SERVER_DESIGN_TEST08             = "10";       // 기획테스트서버08
-    public static final String SERVER_QA                        = "18";       // QA 서버 (개발DB씀)
-    public static final String SERVER_DAILYQA                   = "22";       // DailyQA 서버
-    public static final String SERVER_BALANCE                   = "23";       // Balance 서버
-    public static final String SERVER_POLISHING                 = "28";       // 폴리싱서버
-    public static final String SERVER_FREEZINGFIX               = "35";       // 프리징픽스
-    public static final String SERVER_COMPANY                   = "47";       // 전사테스트 서버
-    public static final String SERVER_FGT                       = "50";       // FGT서버
+    public static final String SERVER_FREEZING = "1"; // 프리징 서버
+    public static final String SERVER_DEV = "2"; // 개발서버
+    public static final String SERVER_DESIGN_TEST01 = "4"; // 기획테스트서버01
+    public static final String SERVER_DESIGN_TEST02 = "5"; // 기획테스트서버02
+    public static final String SERVER_DESIGN_TEST03 = "6"; // 기획테스트서버03
+    public static final String SERVER_DESIGN_TEST04 = "7"; // 기획테스트서버04
+    public static final String SERVER_DESIGN_TEST05 = "8"; // 기획테스트서버05
+    public static final String SERVER_DESIGN_TEST06 = "3"; // 기획테스트서버06
+    public static final String SERVER_DESIGN_TEST07 = "9"; // 기획테스트서버07
+    public static final String SERVER_DESIGN_TEST08 = "10"; // 기획테스트서버08
+    public static final String SERVER_QA = "18"; // QA 서버 (개발DB씀)
+    public static final String SERVER_DAILYQA = "22"; // DailyQA 서버
+    public static final String SERVER_BALANCE = "23"; // Balance 서버
+    public static final String SERVER_POLISHING = "28"; // 폴리싱서버
+    public static final String SERVER_FREEZINGFIX = "35"; // 프리징픽스
+    public static final String SERVER_COMPANY = "47"; // 전사테스트 서버
+    public static final String SERVER_FGT = "50"; // FGT서버
 
     public static final RestTemplate restTemplate = new RestTemplate();
+
+    private static String PROFILES = null;
+
+    public static String profiles() {
+        if (PROFILES == null) {
+            String springProfilesActive = System.getProperty("spring.profiles.active");
+            PROFILES = (springProfilesActive == null) ? "default" : springProfilesActive;
+        }
+        return PROFILES;
+    }
+
+    public static boolean isLive() {
+        return "production".equals(profiles());
+    }
 
     public static String getIpAddress() {
 
@@ -76,6 +90,7 @@ public class NopsUtil {
 
     /**
      * HttpServletRequest 에서 사용자 정보 가져오기
+     * 
      * @return
      */
     public static String getUser() {
@@ -91,7 +106,7 @@ public class NopsUtil {
     public static int columnCheck(List<String> keyList, String column) {
 
         int chk = 0;
-        for(String columnKey : keyList) {
+        for (String columnKey : keyList) {
             if (columnKey.equalsIgnoreCase(column)) {
                 chk++;
                 break;
@@ -141,18 +156,18 @@ public class NopsUtil {
                         String value = String.valueOf(entry.getValue());
 
                         // 소수점 뒷자리가 .0일경우 제거
-                        if( isNumber(value) ) {
+                        if (isNumber(value)) {
                             double doubleVal = Double.parseDouble(value);
-                            double result = doubleVal - (int)doubleVal;
-                            if(result == 0) {
-                                value = (int)doubleVal + "";
+                            double result = doubleVal - (int) doubleVal;
+                            if (result == 0) {
+                                value = (int) doubleVal + "";
                             }
                         }
 
                         if (value.contains(",")) {
                             // 콤마가 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value.replaceAll("\"", "\"\"");
-                            //콤마가 중간에 있으면 " 으로 감싸줌
+                            // 콤마가 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -206,18 +221,18 @@ public class NopsUtil {
                         String value = String.valueOf(entry.getValue());
 
                         // 소수점 뒷자리가 .0일경우 제거
-                        if( isNumber(value) ) {
+                        if (isNumber(value)) {
                             double doubleVal = Double.parseDouble(value);
-                            double result = doubleVal - (int)doubleVal;
-                            if(result == 0) {
-                                value = (int)doubleVal + "";
+                            double result = doubleVal - (int) doubleVal;
+                            if (result == 0) {
+                                value = (int) doubleVal + "";
                             }
                         }
 
                         if (value.contains(",")) {
                             // 콤마가 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value.replaceAll("\"", "\"\"");
-                            //콤마가 중간에 있으면 " 으로 감싸줌
+                            // 콤마가 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -253,27 +268,27 @@ public class NopsUtil {
 
     public static boolean sendNotificationSlackTarget(String content, String target) {
         String recipients = "\"" + target + "\"";
-        return sendNotifications(null, content, "","black",recipients);
+        return sendNotifications(null, content, "", "black", recipients);
     }
 
     public static boolean sendNotificationChannel(String content, String channel) {
         String recipients = "\"#" + channel + "\"";
-        return sendNotifications(null, content, "","black",recipients);
+        return sendNotifications(null, content, "", "black", recipients);
     }
 
     public static boolean sendNotificationUser(String content, String user) {
         String recipients = "\"@" + user + "\"";
-        return sendNotifications(null, content, "","black",recipients);
+        return sendNotifications(null, content, "", "black", recipients);
     }
 
     public static boolean sendNotificationUsers(String content, List<String> userList) {
         String recipients = String.join("\",\"@", userList);
         recipients = "\"@" + recipients + "\"";
-        return sendNotifications(null, content, "","black",recipients);
+        return sendNotifications(null, content, "", "black", recipients);
     }
 
-    public static boolean sendNotifications(String host, String content, String attachments, 
-            String color, String recipients) {
+    public static boolean sendNotifications(String host, String content, String attachments, String color,
+            String recipients) {
 
         try {
             String _host = (host == null) ? "http://noti.npixel.co.kr" : host;
@@ -284,18 +299,10 @@ public class NopsUtil {
             MediaType mediaType = new MediaType("application", "json", utf8);
             headers.setContentType(mediaType);
 
-            String requestJson =    "{" +
-                    "\"data\": [{" +
-                    "\"send_type\": \"5\"," +
-                    "\"recipients\": ["+recipients+"]," +
-                    "\"bot_name\": \"NOPS Noti Service\"," +
-                    "\"content\": \"" + content + "\"," +
-                    "\"attachments\":[{" +
-                    "\"text\":\"" + attachments + "\"," +
-                    "\"color\": \"" + color + "\"" +
-                    "}]" +
-                    "}]" +
-                    "}";
+            String requestJson = "{" + "\"data\": [{" + "\"send_type\": \"5\"," + "\"recipients\": [" + recipients
+                    + "]," + "\"bot_name\": \"NOPS Noti Service\"," + "\"content\": \"" + content + "\","
+                    + "\"attachments\":[{" + "\"text\":\"" + attachments + "\"," + "\"color\": \"" + color + "\"" + "}]"
+                    + "}]" + "}";
 
             HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
@@ -312,6 +319,7 @@ public class NopsUtil {
 
     /**
      * 현재 시간을 입력한 포맷에 맞게 출력
+     * 
      * @param format ex) yyyy-MM-dd HH:mm:ss
      * @return
      */
@@ -319,7 +327,7 @@ public class NopsUtil {
 
         try {
 
-            if(format == null || "".equals(format) || "now".equals(format)) {
+            if (format == null || "".equals(format) || "now".equals(format)) {
                 format = "yyyy-MM-dd HH:mm:ss";
             }
 
@@ -336,6 +344,7 @@ public class NopsUtil {
 
     /**
      * Page 객체에 담긴 내용을 Map으로 변환하고 Map의 Key를 필터 할 수 있는 메서드
+     * 
      * @param objectList
      * @param filter
      * @return
@@ -389,6 +398,7 @@ public class NopsUtil {
 
     /**
      * Page 객체에 담긴 내용을 Map으로 변환하고 Map의 Key를 필터 할 수 있는 메서드 ( 가공 안하고 싶을때 사용 )
+     * 
      * @param json
      * @param filter
      * @return
@@ -400,13 +410,14 @@ public class NopsUtil {
         ObjectMapper mapper = new ObjectMapper();
         try {
 
-            map = mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
+            map = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
+            });
 
-            if(filter != null && filter.length > 0) {
-                List<Map<String, Object>> mapList = (List)map.get("content");
-                for(Map<String, Object> data : mapList) {
-                    for(String str : filter) {
-                        if(data.containsKey(str)) {
+            if (filter != null && filter.length > 0) {
+                List<Map<String, Object>> mapList = (List) map.get("content");
+                for (Map<String, Object> data : mapList) {
+                    for (String str : filter) {
+                        if (data.containsKey(str)) {
                             data.remove(str);
                         }
 
@@ -430,6 +441,7 @@ public class NopsUtil {
 
     /**
      * orderNum 컬럼의 순번을 매길때 사용
+     * 
      * @param dataMap
      * @return
      */
@@ -437,16 +449,17 @@ public class NopsUtil {
 
         try {
 
-            int totalElements = Integer.parseInt(dataMap.get("totalElements").toString());              // totalElements : 73
-            int numberOfElements = Integer.parseInt(dataMap.get("numberOfElements").toString());        // numberOfElements : 13
-            int size = Integer.parseInt(dataMap.get("size").toString());                                // size : 15
-            int number = Integer.parseInt(dataMap.get("number").toString());                            // number : 4
+            int totalElements = Integer.parseInt(dataMap.get("totalElements").toString()); // totalElements : 73
+            int numberOfElements = Integer.parseInt(dataMap.get("numberOfElements").toString()); // numberOfElements :
+                                                                                                 // 13
+            int size = Integer.parseInt(dataMap.get("size").toString()); // size : 15
+            int number = Integer.parseInt(dataMap.get("number").toString()); // number : 4
 
-            int startOrder = (totalElements - (size * number));                                         // 13
-            int endOrder = (startOrder - numberOfElements);                                             // 0
+            int startOrder = (totalElements - (size * number)); // 13
+            int endOrder = (startOrder - numberOfElements); // 0
 
             int cnt = 0;
-            for(int i=startOrder; i > endOrder; i--) {
+            for (int i = startOrder; i > endOrder; i--) {
                 (((List<Map<String, Object>>) dataMap.get("content")).get(cnt)).put("orderNum", i);
                 cnt++;
             }

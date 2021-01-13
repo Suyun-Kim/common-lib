@@ -94,7 +94,11 @@ public class NopsUtil {
      * @return
      */
     public static String getUser() {
-        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRemoteUser();
+        if (RequestContextHolder.getRequestAttributes() != null)
+            return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
+                                                                                           .getRemoteUser();
+
+        return "USER-Thread";
     }
 
     /**

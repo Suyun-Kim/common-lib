@@ -46,6 +46,11 @@ public class NopsUtil {
     public static final String SERVER_FREEZINGFIX = "35"; // 프리징픽스
     public static final String SERVER_COMPANY = "47"; // 전사테스트 서버
     public static final String SERVER_FGT = "50"; // FGT서버
+    
+    public static final String SERVER_DEPLOY_QA = "60";
+    public static final String SERVER_DEPLOY_QAFIX = "59"; 
+    public static final String SERVER_DEPLOY_QA_OLD = "5000"; 
+    public static final String SERVER_DEPLOY_QAFIX_OLD = "5000"; 
 
     public static final RestTemplate restTemplate = new RestTemplate();
 

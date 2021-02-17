@@ -10,13 +10,11 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.nx.lib.exception.BaseException;
@@ -39,18 +37,6 @@ public class CrossAPIv2 extends CrossAPI {
         }
         this.authorizationToken = authorizationToken;
         return this;
-    }
-
-    private List<ServiceInstance> getServiceInstance(String serviceId) {
-        return super.discoveryClient.getInstances(serviceId);
-    }
-
-    private String getHost(String serviceId, String urlParam) {
-        ServiceInstance serviceInstance = getServiceInstance(serviceId).get(0);
-        return new StringBuilder(serviceInstance.getHost()).append(":")
-                                                           .append(serviceInstance.getPort())
-                                                           .append(urlParam)
-                                                           .toString();
     }
 
     public <T> ResponseEntity<T> GET(String serviceId, String urlParam, Class<T> clz) {
@@ -91,43 +77,40 @@ public class CrossAPIv2 extends CrossAPI {
             Map<String, Object> queryParams, Class<T> clz) {
         String token = this.checkToken();
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
-            params.add(entry.getKey(), String.valueOf(entry.getValue()));
-        }
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                                                           .scheme("http")
+                                                           .host(this.getHost(serviceId, urlParam));
 
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                                                          .scheme("http")
-                                                          .host(this.getHost(serviceId, urlParam))
-                                                          .queryParams(params)
-                                                          .build();
+        if (!queryParams.isEmpty()) {
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
+                params.add(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+
+            builder.queryParams(params);
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
         HttpEntity requestEntity = new HttpEntity("parameters", headers);
-
-        boolean isEmpty = false;
-        ResponseEntity<T> res = null;
+        ResponseEntity<T> res;
 
         try {
-            res = rt.exchange(uriComponents.toUriString(), HttpMethod.GET, requestEntity, clz);
+            res = rt.exchange(builder.build().toUriString(), method, requestEntity, clz);
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
         } catch (HttpStatusCodeException e) {
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
-            isEmpty = true;
-        }
-
-        if (isEmpty) {
             T emptyObj = null;
             if (clz == Map.class) {
                 emptyObj = (T) Collections.emptyMap();
             } else if (clz == List.class) {
                 emptyObj = (T) Collections.emptyList();
             }
-            return new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+            res = new ResponseEntity<>(emptyObj, e.getStatusCode());
+            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
         }
+
         return res;
     }
 
@@ -152,27 +135,22 @@ public class CrossAPIv2 extends CrossAPI {
         }
 
         HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
-
-        boolean isEmpty = false;
         ResponseEntity<T> res = null;
 
         try {
             res = rt.exchange(url, method, requestEntity, clz);
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
         } catch (HttpStatusCodeException e) {
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
-            isEmpty = true;
-        }
-
-        if (isEmpty) {
             T emptyObj = null;
             if (clz == Map.class) {
                 emptyObj = (T) Collections.emptyMap();
             } else if (clz == List.class) {
                 emptyObj = (T) Collections.emptyList();
             }
-            return new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+            res = new ResponseEntity<>(emptyObj, e.getStatusCode());
+            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
         }
+
         return res;
     }
 
@@ -183,5 +161,17 @@ public class CrossAPIv2 extends CrossAPI {
         }
 
         return bearer(token);
+    }
+
+    private List<ServiceInstance> getServiceInstance(String serviceId) {
+        return super.discoveryClient.getInstances(serviceId);
+    }
+
+    private String getHost(String serviceId, String urlParam) {
+        ServiceInstance serviceInstance = getServiceInstance(serviceId).get(0);
+        return new StringBuilder(serviceInstance.getHost()).append(":")
+                                                           .append(serviceInstance.getPort())
+                                                           .append(urlParam)
+                                                           .toString();
     }
 }

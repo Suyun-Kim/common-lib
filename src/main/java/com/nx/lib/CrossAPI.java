@@ -25,9 +25,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CrossAPI {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private DiscoveryClient discoveryClient;
+    protected DiscoveryClient discoveryClient;
 
     // TODO 전부 바꾼 후 제거
     private final String CROSS_API_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTc4NzM1NjksInVzZ"
@@ -49,9 +49,9 @@ public class CrossAPI {
             + "oDcg9UCUs2TSEwXbqVSfvEbTdvx6x_BlhG_zX4dRTjhgPQ-z9NyGRa0r8uM-5qPzxM"
             + "OXkzEdYu-BiSb-bgBmiOLT5MOLOWJNEKvXIQbNX35lz3iTEm1IF3BHwG3K8KfGkKUINMxIMcLjyFxXk0YDHsQ";
 
-    private final ObjectMapper objectMapper;
-    private final RestTemplate rt;
-    private final String systemProfiles;
+    protected final ObjectMapper objectMapper;
+    protected final RestTemplate rt;
+    protected final String systemProfiles;
 
     public CrossAPI(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
@@ -335,7 +335,7 @@ public class CrossAPI {
                 : CROSS_API_TOKEN;
     }
 
-    private String bearer(String token) {
+    protected String bearer(String token) {
         return (token.startsWith("Bearer")) ? token : "Bearer " + token;
     }
 }

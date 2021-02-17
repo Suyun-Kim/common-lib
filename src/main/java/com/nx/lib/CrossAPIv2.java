@@ -109,6 +109,8 @@ public class CrossAPIv2 extends CrossAPI {
             }
             res = new ResponseEntity<>(emptyObj, e.getStatusCode());
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+        } catch (Exception e) {
+            throw new BaseException("1001", e.getMessage());
         }
 
         return res;
@@ -149,6 +151,8 @@ public class CrossAPIv2 extends CrossAPI {
             }
             res = new ResponseEntity<>(emptyObj, e.getStatusCode());
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
+        } catch (Exception e) {
+            throw new BaseException("1001", "UNKNOWN EXCEPTION : " + e.getMessage());
         }
 
         return res;
@@ -157,7 +161,7 @@ public class CrossAPIv2 extends CrossAPI {
     private String checkToken() {
         String token = (this.authorizationToken != null) ? this.authorizationToken : authorizationToken;
         if (token == null || "".equals(token)) {
-            throw new BaseException("1000", "NOT FOUND : Authorization Token");
+            throw new BaseException("1000", "NOTFOUND EXCEPTION : Authorization Token");
         }
 
         return bearer(token);

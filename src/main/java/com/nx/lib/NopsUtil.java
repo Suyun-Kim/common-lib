@@ -47,10 +47,10 @@ public class NopsUtil {
     public static final String SERVER_COMPANY = "47"; // 전사테스트 서버
     public static final String SERVER_FGT = "50"; // FGT서버
     
-    public static final String SERVER_DEPLOY_QA = "38";
-    public static final String SERVER_DEPLOY_QAFIX = "34"; 
-    public static final String SERVER_DEPLOY_QA_OLD = "60"; 
-    public static final String SERVER_DEPLOY_QAFIX_OLD = "59"; 
+    public static final String SERVER_DEPLOY_QA = "50";
+    public static final String SERVER_DEPLOY_QAFIX = "35"; 
+    public static final String SERVER_DEPLOY_QA_OLD = "1"; 
+    public static final String SERVER_DEPLOY_QAFIX_OLD = "28"; 
 
     public static final RestTemplate restTemplate = new RestTemplate();
 

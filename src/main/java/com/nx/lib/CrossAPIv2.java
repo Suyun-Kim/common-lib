@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
@@ -19,10 +20,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.nx.lib.exception.BaseException;
-import com.nx.lib.obj.ResponseEnvelop;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class CrossAPIv2 extends CrossAPI {
+    // Not Null
     private String authorizationToken;
 
     public CrossAPIv2(DiscoveryClient discoveryClient) {
@@ -142,15 +143,14 @@ public class CrossAPIv2 extends CrossAPI {
     private <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity requestEntity, String urlParam,
             Class<T> clz) {
         try {
-            ResponseEntity<ResponseEnvelop> crossApiResponse = rt.exchange(url, method, requestEntity,
-                    ResponseEnvelop.class);
+            ResponseEntity<Map> crossApiResponse = rt.exchange(url, method, requestEntity, Map.class);
 
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam,
                     crossApiResponse.getStatusCode());
 
-            ResponseEnvelop<T> responseEnvelop = crossApiResponse.getBody();
+            Map<String, Object> crossApiResponseMap = crossApiResponse.getBody();
 
-            T result = responseEnvelop.getResult();
+            T result = (T) crossApiResponseMap.get("result");
 
             if (result == null || clz == null)
                 return new ResponseEntity<>(crossApiResponse.getStatusCode());

@@ -19,6 +19,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.nx.lib.exception.BaseException;
+import com.nx.lib.obj.ResponseEnvelop;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class CrossAPIv2 extends CrossAPI {
@@ -141,18 +142,19 @@ public class CrossAPIv2 extends CrossAPI {
     private <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity requestEntity, String urlParam,
             Class<T> clz) {
         try {
-            ResponseEntity<Map> crossApiResponse = rt.exchange(url, method, requestEntity, Map.class);
+            ResponseEntity<ResponseEnvelop> crossApiResponse = rt.exchange(url, method, requestEntity,
+                    ResponseEnvelop.class);
 
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam,
                     crossApiResponse.getStatusCode());
 
-            Map<String, Object> crossApiResponseMap = crossApiResponse.getBody();
+            ResponseEnvelop<T> responseEnvelop = crossApiResponse.getBody();
 
-            Object result = crossApiResponseMap.get("result");
+            T result = responseEnvelop.getResult();
 
             if (result == null || clz == null)
                 return new ResponseEntity<>(crossApiResponse.getStatusCode());
-            return new ResponseEntity<>((T) result, crossApiResponse.getStatusCode());
+            return new ResponseEntity<>(result, crossApiResponse.getStatusCode());
         } catch (Exception e) {
 
             T emptyObj = null;

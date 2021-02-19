@@ -10,6 +10,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -121,24 +122,62 @@ public class CrossAPIv2 extends CrossAPI {
         return exchange(builder.build().toUriString(), method, new HttpEntity(bodyStr, headers), urlParam, clz);
     }
 
+    // Return ResponseEntity : 'result', 'HttpStatusCode'
     private <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity requestEntity, String urlParam,
             Class<T> clz) {
         ResponseEntity<T> res;
         try {
-            res = rt.exchange(url, method, requestEntity, clz);
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
-        } catch (HttpStatusCodeException e) {
+            ResponseEntity<Map> crossApiResponse = rt.exchange(url, method, requestEntity, Map.class);
+
+            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam,
+                    crossApiResponse.getStatusCode());
+
+            Map<String, Object> crossApiResponseMap = crossApiResponse.getBody();
+
+            Object result = crossApiResponseMap.get("result");
+
+            if (result == null)
+                return new ResponseEntity<>(crossApiResponse.getStatusCode());
+
+            T typeResult = null;
+            if (clz == Map.class) {
+                typeResult = (T) result;
+            } else if (clz == List.class) {
+                typeResult = (T) result;
+            }
+
+            res = new ResponseEntity<>(typeResult, crossApiResponse.getStatusCode());
+        } catch (Exception e) {
+
             T emptyObj = null;
+
             if (clz == Map.class) {
                 emptyObj = (T) Collections.emptyMap();
             } else if (clz == List.class) {
                 emptyObj = (T) Collections.emptyList();
             }
-            res = new ResponseEntity<>(emptyObj, e.getStatusCode());
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
-        } catch (Exception e) {
-            throw new BaseException("1001", e.getMessage());
+
+            if (e instanceof HttpStatusCodeException) {
+                HttpStatusCodeException err = (HttpStatusCodeException) e;
+
+                logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam,
+                        err.getStatusCode());
+
+                res = new ResponseEntity<>(emptyObj, err.getStatusCode());
+            } else if (e instanceof ClassCastException) {
+                logger.info(
+                        "[{}] CrossAPIv2 Response Url [{}] Response [500] CrossApi Result Type Casting Exception [{}]",
+                        getProfile(), urlParam, e.getMessage());
+                res = new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                logger.info("[{}] CrossAPIv2 Response Url [{}] Response [500] Undefined Exception [{}]", getProfile(),
+                        urlParam, e.getMessage());
+
+                res = new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
         }
+
         return res;
     }
 

@@ -41,7 +41,7 @@ public class CrossAPIv2 extends CrossAPI {
         return this;
     }
 
-    public ResponseEntity GET(String serviceId, String urlParam) {
+    public ResponseEntity<Void> GET(String serviceId, String urlParam) {
         return GET(serviceId, urlParam, Collections.emptyMap(), null);
     }
 
@@ -53,7 +53,7 @@ public class CrossAPIv2 extends CrossAPI {
         return queryRequest(HttpMethod.GET, serviceId, urlParam, queryParams, clz);
     }
 
-    public ResponseEntity POST(String serviceId, String urlParam) {
+    public ResponseEntity<Void> POST(String serviceId, String urlParam) {
         return POST(serviceId, urlParam, Collections.emptyMap(), null);
     }
 
@@ -65,7 +65,7 @@ public class CrossAPIv2 extends CrossAPI {
         return bodyRequest(HttpMethod.POST, serviceId, urlParam, bodyMap, clz);
     }
 
-    public ResponseEntity PUT(String serviceId, String urlParam) {
+    public ResponseEntity<Void> PUT(String serviceId, String urlParam) {
         return PUT(serviceId, urlParam, Collections.emptyMap(), null);
     }
 
@@ -77,7 +77,7 @@ public class CrossAPIv2 extends CrossAPI {
         return bodyRequest(HttpMethod.PUT, serviceId, urlParam, bodyMap, clz);
     }
 
-    public ResponseEntity DELETE(String serviceId, String urlParam) {
+    public ResponseEntity<Void> DELETE(String serviceId, String urlParam) {
         return DELETE(serviceId, urlParam, Collections.emptyMap(), null);
     }
 

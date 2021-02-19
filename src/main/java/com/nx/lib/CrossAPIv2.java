@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.nx.lib.exception.BaseException;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class CrossAPIv2 extends CrossAPI {
     private String authorizationToken;
 
@@ -72,7 +73,6 @@ public class CrossAPIv2 extends CrossAPI {
         return queryRequest(HttpMethod.DELETE, serviceId, urlParam, queryParams, clz);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     private <T> ResponseEntity<T> queryRequest(HttpMethod method, String serviceId, String urlParam,
             Map<String, Object> queryParams, Class<T> clz) {
         String token = this.checkToken();
@@ -94,34 +94,16 @@ public class CrossAPIv2 extends CrossAPI {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
-        HttpEntity requestEntity = new HttpEntity("parameters", headers);
-        ResponseEntity<T> res;
-
-        try {
-            res = rt.exchange(builder.build().toUriString(), method, requestEntity, clz);
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
-        } catch (HttpStatusCodeException e) {
-            T emptyObj = null;
-            if (clz == Map.class) {
-                emptyObj = (T) Collections.emptyMap();
-            } else if (clz == List.class) {
-                emptyObj = (T) Collections.emptyList();
-            }
-            res = new ResponseEntity<>(emptyObj, e.getStatusCode());
-            logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
-        } catch (Exception e) {
-            throw new BaseException("1001", e.getMessage());
-        }
-
-        return res;
+        return exchange(builder.build().toUriString(), method, new HttpEntity("parameters", headers), urlParam, clz);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     private <T> ResponseEntity<T> bodyRequest(HttpMethod method, String serviceId, String urlParam,
             Map<String, Object> bodyMap, Class<T> clz) {
         String token = this.checkToken();
 
-        String url = "http://" + getHost(serviceId, urlParam);
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                                                           .scheme("http")
+                                                           .host(this.getHost(serviceId, urlParam));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -136,9 +118,12 @@ public class CrossAPIv2 extends CrossAPI {
             }
         }
 
-        HttpEntity requestEntity = new HttpEntity(bodyStr, headers);
-        ResponseEntity<T> res = null;
+        return exchange(builder.build().toUriString(), method, new HttpEntity(bodyStr, headers), urlParam, clz);
+    }
 
+    private <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity requestEntity, String urlParam,
+            Class<T> clz) {
+        ResponseEntity<T> res;
         try {
             res = rt.exchange(url, method, requestEntity, clz);
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());
@@ -152,23 +137,25 @@ public class CrossAPIv2 extends CrossAPI {
             res = new ResponseEntity<>(emptyObj, e.getStatusCode());
             logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam, e.getStatusCode());
         } catch (Exception e) {
-            throw new BaseException("1001", "UNKNOWN EXCEPTION : " + e.getMessage());
+            throw new BaseException("1001", e.getMessage());
         }
-
         return res;
     }
 
     private String checkToken() {
-        String token = (this.authorizationToken != null) ? this.authorizationToken : authorizationToken;
-        if (token == null || "".equals(token)) {
-            throw new BaseException("1000", "NOTFOUND EXCEPTION : Authorization Token");
+        if (this.authorizationToken == null || "".equals(this.authorizationToken)) {
+            throw new BaseException("1000", "NOTFOUND EXCEPTION : Authorization Token이 필요합니다.");
         }
 
-        return bearer(token);
+        return bearer(this.authorizationToken);
     }
 
     private List<ServiceInstance> getServiceInstance(String serviceId) {
-        return super.discoveryClient.getInstances(serviceId);
+        List<ServiceInstance> instances = super.discoveryClient.getInstances(serviceId);
+        if (instances.isEmpty())
+            throw new BaseException("1002", "EUREKA EXCEPTION : Eureka 인스턴스를 찾을 수 없습니다.");
+
+        return instances;
     }
 
     private String getHost(String serviceId, String urlParam) {

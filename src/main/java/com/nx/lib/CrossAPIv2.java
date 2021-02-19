@@ -41,12 +41,20 @@ public class CrossAPIv2 extends CrossAPI {
         return this;
     }
 
+    public ResponseEntity GET(String serviceId, String urlParam) {
+        return GET(serviceId, urlParam, Collections.emptyMap(), null);
+    }
+
     public <T> ResponseEntity<T> GET(String serviceId, String urlParam, Class<T> clz) {
         return GET(serviceId, urlParam, Collections.emptyMap(), clz);
     }
 
     public <T> ResponseEntity<T> GET(String serviceId, String urlParam, Map<String, Object> queryParams, Class<T> clz) {
         return queryRequest(HttpMethod.GET, serviceId, urlParam, queryParams, clz);
+    }
+
+    public ResponseEntity POST(String serviceId, String urlParam) {
+        return POST(serviceId, urlParam, Collections.emptyMap(), null);
     }
 
     public <T> ResponseEntity<T> POST(String serviceId, String urlParam, Class<T> clz) {
@@ -57,12 +65,20 @@ public class CrossAPIv2 extends CrossAPI {
         return bodyRequest(HttpMethod.POST, serviceId, urlParam, bodyMap, clz);
     }
 
+    public ResponseEntity PUT(String serviceId, String urlParam) {
+        return PUT(serviceId, urlParam, Collections.emptyMap(), null);
+    }
+
     public <T> ResponseEntity<T> PUT(String serviceId, String urlParam, Class<T> clz) {
         return PUT(serviceId, urlParam, Collections.emptyMap(), clz);
     }
 
     public <T> ResponseEntity<T> PUT(String serviceId, String urlParam, Map<String, Object> bodyMap, Class<T> clz) {
         return bodyRequest(HttpMethod.PUT, serviceId, urlParam, bodyMap, clz);
+    }
+
+    public ResponseEntity DELETE(String serviceId, String urlParam) {
+        return DELETE(serviceId, urlParam, Collections.emptyMap(), null);
     }
 
     public <T> ResponseEntity<T> DELETE(String serviceId, String urlParam, Class<T> clz) {
@@ -122,10 +138,8 @@ public class CrossAPIv2 extends CrossAPI {
         return exchange(builder.build().toUriString(), method, new HttpEntity(bodyStr, headers), urlParam, clz);
     }
 
-    // Return ResponseEntity : 'result', 'HttpStatusCode'
     private <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity requestEntity, String urlParam,
             Class<T> clz) {
-        ResponseEntity<T> res;
         try {
             ResponseEntity<Map> crossApiResponse = rt.exchange(url, method, requestEntity, Map.class);
 
@@ -136,10 +150,9 @@ public class CrossAPIv2 extends CrossAPI {
 
             Object result = crossApiResponseMap.get("result");
 
-            if (result == null)
+            if (result == null || clz == null)
                 return new ResponseEntity<>(crossApiResponse.getStatusCode());
-
-            res = new ResponseEntity<>((T) result, crossApiResponse.getStatusCode());
+            return new ResponseEntity<>((T) result, crossApiResponse.getStatusCode());
         } catch (Exception e) {
 
             T emptyObj = null;
@@ -156,22 +169,19 @@ public class CrossAPIv2 extends CrossAPI {
                 logger.info("[{}] CrossAPIv2 Response Url [{}] Response [{}]", getProfile(), urlParam,
                         err.getStatusCode());
 
-                res = new ResponseEntity<>(emptyObj, err.getStatusCode());
-            } else if (e instanceof ClassCastException) {
-                logger.info(
-                        "[{}] CrossAPIv2 Response Url [{}] Response [500] CrossApi Result Type Casting Exception [{}]",
-                        getProfile(), urlParam, e.getMessage());
-                res = new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+                if (emptyObj == null)
+                    return new ResponseEntity<>(err.getStatusCode());
+                return new ResponseEntity<>(emptyObj, err.getStatusCode());
             } else {
                 logger.info("[{}] CrossAPIv2 Response Url [{}] Response [500] Undefined Exception [{}]", getProfile(),
                         urlParam, e.getMessage());
 
-                res = new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
+                if (emptyObj == null)
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(emptyObj, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
         }
-
-        return res;
     }
 
     private String checkToken() {

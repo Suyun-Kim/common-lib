@@ -139,14 +139,7 @@ public class CrossAPIv2 extends CrossAPI {
             if (result == null)
                 return new ResponseEntity<>(crossApiResponse.getStatusCode());
 
-            T typeResult = null;
-            if (clz == Map.class) {
-                typeResult = (T) result;
-            } else if (clz == List.class) {
-                typeResult = (T) result;
-            }
-
-            res = new ResponseEntity<>(typeResult, crossApiResponse.getStatusCode());
+            res = new ResponseEntity<>((T) result, crossApiResponse.getStatusCode());
         } catch (Exception e) {
 
             T emptyObj = null;

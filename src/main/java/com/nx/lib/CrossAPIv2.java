@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
@@ -44,7 +43,7 @@ public class CrossAPIv2 extends CrossAPI {
     }
 
     public ResponseEntity<Void> GET(String serviceId, String urlParam) {
-        return GET(serviceId, urlParam, Collections.emptyMap(), null);
+        return GET(serviceId, urlParam, Collections.emptyMap(), Void.class);
     }
 
     public <T> ResponseEntity<T> GET(String serviceId, String urlParam, Class<T> clz) {
@@ -56,7 +55,7 @@ public class CrossAPIv2 extends CrossAPI {
     }
 
     public ResponseEntity<Void> POST(String serviceId, String urlParam) {
-        return POST(serviceId, urlParam, Collections.emptyMap(), null);
+        return POST(serviceId, urlParam, Collections.emptyMap(), Void.class);
     }
 
     public <T> ResponseEntity<T> POST(String serviceId, String urlParam, Class<T> clz) {
@@ -68,7 +67,7 @@ public class CrossAPIv2 extends CrossAPI {
     }
 
     public ResponseEntity<Void> PUT(String serviceId, String urlParam) {
-        return PUT(serviceId, urlParam, Collections.emptyMap(), null);
+        return PUT(serviceId, urlParam, Collections.emptyMap(), Void.class);
     }
 
     public <T> ResponseEntity<T> PUT(String serviceId, String urlParam, Class<T> clz) {
@@ -80,7 +79,7 @@ public class CrossAPIv2 extends CrossAPI {
     }
 
     public ResponseEntity<Void> DELETE(String serviceId, String urlParam) {
-        return DELETE(serviceId, urlParam, Collections.emptyMap(), null);
+        return DELETE(serviceId, urlParam, Collections.emptyMap(), Void.class);
     }
 
     public <T> ResponseEntity<T> DELETE(String serviceId, String urlParam, Class<T> clz) {
@@ -149,11 +148,14 @@ public class CrossAPIv2 extends CrossAPI {
                     crossApiResponse.getStatusCode());
 
             Map<String, Object> crossApiResponseMap = crossApiResponse.getBody();
+            Object apiResult = crossApiResponseMap.get("result");
 
-            T result = (T) crossApiResponseMap.get("result");
-
-            if (result == null || clz == null)
+            if (apiResult == null || clz == null || clz == Void.class) {
                 return new ResponseEntity<>(crossApiResponse.getStatusCode());
+            }
+
+            T result = (T) apiResult;
+
             return new ResponseEntity<>(result, crossApiResponse.getStatusCode());
         } catch (Exception e) {
 

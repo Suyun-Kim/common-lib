@@ -171,7 +171,7 @@ public class NopsUtil {
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
-                            value.replaceAll("\"", "\"\"");
+                            value = value.replace("\"", "\"\"");
                             //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
@@ -235,7 +235,7 @@ public class NopsUtil {
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
-                            value.replaceAll("\"", "\"\"");
+                            value = value.replace("\"", "\"\"");
                             //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
@@ -299,7 +299,7 @@ public class NopsUtil {
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
-                            value.replaceAll("\"", "\"\"");
+                            value = value.replace("\"", "\"\"");
                             //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
@@ -363,7 +363,7 @@ public class NopsUtil {
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
-                            value.replaceAll("\"", "\"\"");
+                            value = value.replace("\"", "\"\"");
                             //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {

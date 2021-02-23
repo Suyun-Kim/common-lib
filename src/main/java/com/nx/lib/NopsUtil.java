@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -184,14 +180,12 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0) {
+                    if (map.size() > 0 && i < list.size()-1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append("\n");
                     }
-
                     i++;
                 }
-
-                return str.deleteCharAt(str.lastIndexOf("\n")).toString();
+                return str.deleteCharAt(str.lastIndexOf(",")).toString();
             } else
                 return "";
         } catch (Exception ex) {
@@ -250,14 +244,12 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0) {
+                    if (map.size() > 0 && i < list.size()-1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append(carriageReturn);
                     }
-
                     i++;
                 }
-
-                return str.deleteCharAt(str.lastIndexOf(carriageReturn)).toString();
+                return str.deleteCharAt(str.lastIndexOf(",")).toString();
             } else
                 return "";
         } catch (Exception ex) {
@@ -316,14 +308,12 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0) {
+                    if (map.size() > 0 && i < list.size()-1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append("\n");
                     }
-
                     i++;
                 }
-
-                return str.deleteCharAt(str.lastIndexOf("\n")).toString();
+                return str.deleteCharAt(str.lastIndexOf(",")).toString();
             } else
                 return "";
         } catch (Exception ex) {
@@ -382,14 +372,12 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0) {
+                    if (map.size() > 0 && i < list.size()-1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append(carriageReturn);
                     }
-
                     i++;
                 }
-
-                return str.deleteCharAt(str.lastIndexOf(carriageReturn)).toString();
+                return str.deleteCharAt(str.lastIndexOf(",")).toString();
             } else
                 return "";
         } catch (Exception ex) {

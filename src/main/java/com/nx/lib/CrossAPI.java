@@ -110,7 +110,7 @@ public class CrossAPI {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
 
-        HttpEntity requestEntity = new HttpEntity("parameters", headers);
+        HttpEntity requestEntity = new HttpEntity(headers);
 
         ResponseEntity<Map> res = null;
         try {
@@ -316,7 +316,7 @@ public class CrossAPI {
         headers.set("Authorization", bearer(token));
 
         ResponseEntity<Map> res = null;
-        HttpEntity requestEntity = new HttpEntity("parameters", headers);
+        HttpEntity requestEntity = new HttpEntity(headers);
         try {
             res = rt.exchange(uriComponents.toUriString(), HttpMethod.DELETE, requestEntity, Map.class);
             logger.info("[{}] CrossAPI Response Url [{}] Response [{}]", getProfile(), urlParam, res.getStatusCode());

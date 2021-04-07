@@ -112,7 +112,7 @@ public class CrossAPIv2 extends CrossAPI {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
-        return exchange(builder.build().toUriString(), method, new HttpEntity("parameters", headers), urlParam, clz);
+        return exchange(builder.build().toUriString(), method, new HttpEntity(headers), urlParam, clz);
     }
 
     private <T> ResponseEntity<T> bodyRequest(HttpMethod method, String serviceId, String urlParam,

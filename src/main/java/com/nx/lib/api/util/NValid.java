@@ -488,13 +488,11 @@ public class NValid {
             }
 
             boolean isContain = false;
-            if (params.get(k) != null) {
-                String value = String.valueOf(params.get(k));
-                for (Object containValue : containsValue) {
-                    if (value.equals(containValue.toString())) {
-                        isContain = true;
-                        break;
-                    }
+            String value = String.valueOf(params.get(k));
+            for (Object containValue : containsValue) {
+                if (value.equals(containValue.toString())) {
+                    isContain = true;
+                    break;
                 }
             }
 

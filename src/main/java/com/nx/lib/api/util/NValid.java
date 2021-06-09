@@ -1,8 +1,8 @@
 package com.nx.lib.api.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -185,14 +185,14 @@ public class NValid {
     private void validate(boolean isValid, String key, String reason) {
         if (!isValid) {
             logger.error("Vaild FAIL");
-            throw new BadRequestException("4000", "파라미터 검증 오류\n[Key] : " + key + ", [Reason] : " + reason);
+            throw new BadRequestException("4000", "파라미터 검증 오류\n[Key] : " + key + ", 원인 : : " + reason);
         }
     }
 
     private void validate(boolean isValid, String reason) {
         if (!isValid) {
             logger.error("Vaild FAIL");
-            throw new BadRequestException("4000", "파라미터 검증 오류\n [Reason] : " + reason);
+            throw new BadRequestException("4000", "파라미터 검증 오류\n 원인 : : " + reason);
         }
     }
 
@@ -315,7 +315,7 @@ public class NValid {
                 return this;
             }
 
-            String value = params.get(k).toString();
+            String value = String.valueOf(params.get(k));
             validate(value.equals(target), k, equalsValue + "와 값이 일치해야 합니다.");
         }
         return this;
@@ -352,7 +352,7 @@ public class NValid {
                 return this;
             }
 
-            String value = params.get(k).toString();
+            String value = String.valueOf(params.get(k));
             validate(!(value.equals(target)), k, notEqualsValue + "가 아닌 값이어야 합니다.");
         }
         return this;
@@ -450,7 +450,7 @@ public class NValid {
                 return this;
             }
 
-            String str = params.get(k).toString();
+            String str = params.getOrDefault(k, "").toString();
             validate(minLen <= str.length() && str.length() <= maxLen, k,
                     "글자 수 검증 실패.[" + minLen + " ~ " + maxLen + "]");
         }
@@ -488,11 +488,13 @@ public class NValid {
             }
 
             boolean isContain = false;
-            String value = params.get(k).toString();
-            for (Object containValue : containsValue) {
-                if (value.equals(containValue.toString())) {
-                    isContain = true;
-                    break;
+            if (params.get(k) != null) {
+                String value = String.valueOf(params.get(k));
+                for (Object containValue : containsValue) {
+                    if (value.equals(containValue.toString())) {
+                        isContain = true;
+                        break;
+                    }
                 }
             }
 
@@ -535,7 +537,7 @@ public class NValid {
 
             boolean bool = true;
             try {
-                bool = maxValue >= Integer.parseInt(params.get(k).toString());
+                bool = maxValue >= Integer.parseInt(String.valueOf(params.get(k)));
             } catch (NumberFormatException e) {
                 bool = false;
             }
@@ -578,7 +580,7 @@ public class NValid {
 
             boolean bool = true;
             try {
-                bool = minValue <= Integer.parseInt(params.get(k).toString());
+                bool = minValue <= Integer.parseInt(String.valueOf(params.get(k)));
             } catch (NumberFormatException e) {
                 bool = false;
             }
@@ -624,7 +626,7 @@ public class NValid {
 
             boolean bool = true;
             try {
-                int val = Integer.parseInt(params.get(k).toString());
+                int val = Integer.parseInt(String.valueOf(params.get(k)));
                 bool = minValue <= val && maxValue >= val;
             } catch (NumberFormatException e) {
                 bool = false;
@@ -666,12 +668,12 @@ public class NValid {
             }
 
             boolean valid = true;
-            String dateStr = params.get(k).toString();
-            sdf.setLenient(false);
-
             try {
+                String dateStr = String.valueOf(params.get(k));
+                sdf.setLenient(false);
+
                 sdf.parse(dateStr);
-            } catch (Exception e) {
+            } catch (ParseException e) {
                 valid = false;
             }
 
@@ -761,7 +763,7 @@ public class NValid {
         for (String k : keyName) {
             try {
                 if (params.containsKey(k) && params.get(k) != null) {
-                    int value = Integer.parseInt(params.get(k).toString());
+                    int value = Integer.parseInt(String.valueOf(params.get(k)));
                     if (value == 0) {
                         continue; // 0 인 값 무시
                     }

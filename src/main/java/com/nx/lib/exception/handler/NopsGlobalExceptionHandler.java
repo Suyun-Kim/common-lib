@@ -3,10 +3,12 @@ package com.nx.lib.exception.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.nx.lib.NopsUtil;
 import com.nx.lib.exception.BadRequestException;
@@ -44,6 +46,30 @@ public class NopsGlobalExceptionHandler {
 
         // 클라이언트 반환
         Error error = new Error(e.getCode(), e.getMessage());
+        ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+        return returnEnvelop;
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ResponseEnvelop<Void> handleBadRequestException2(MissingServletRequestParameterException e) {
+        // 로그 기록
+        this.writeLog(e);
+
+        // 클라이언트 반환
+        Error error = new Error("400", "필수 파라미터가 누락 되었습니다.");
+        ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+        return returnEnvelop;
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ResponseEnvelop<Void> handleBadRequestException3(MethodArgumentTypeMismatchException e) {
+        // 로그 기록
+        this.writeLog(e);
+
+        // 클라이언트 반환
+        Error error = new Error("400", "파라미터 타입이 잘못 되었습니다.");
         ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
         return returnEnvelop;
     }

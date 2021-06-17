@@ -315,6 +315,10 @@ public class NValid {
                 return this;
             }
 
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
             String value = String.valueOf(params.get(k));
             validate(value.equals(target), k, equalsValue + "와 값이 일치해야 합니다.");
         }
@@ -352,6 +356,10 @@ public class NValid {
                 return this;
             }
 
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
             String value = String.valueOf(params.get(k));
             validate(!(value.equals(target)), k, notEqualsValue + "가 아닌 값이어야 합니다.");
         }
@@ -387,6 +395,10 @@ public class NValid {
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
             }
 
             validate(pre.test(params.get(k)), k, "Predicate 검증 실패.");
@@ -450,6 +462,10 @@ public class NValid {
                 return this;
             }
 
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
             String str = params.getOrDefault(k, "").toString();
             validate(minLen <= str.length() && str.length() <= maxLen, k,
                     "글자 수 검증 실패.[" + minLen + " ~ " + maxLen + "]");
@@ -485,6 +501,10 @@ public class NValid {
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
             }
 
             boolean isContain = false;
@@ -533,6 +553,10 @@ public class NValid {
                 return this;
             }
 
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
             boolean bool = true;
             try {
                 bool = maxValue >= Integer.parseInt(String.valueOf(params.get(k)));
@@ -574,6 +598,10 @@ public class NValid {
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
             }
 
             boolean bool = true;
@@ -622,6 +650,10 @@ public class NValid {
                 return this;
             }
 
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
             boolean bool = true;
             try {
                 int val = Integer.parseInt(String.valueOf(params.get(k)));
@@ -663,6 +695,10 @@ public class NValid {
                 }
                 validate(false, k, "값이 없습니다.");
                 return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
             }
 
             boolean valid = true;

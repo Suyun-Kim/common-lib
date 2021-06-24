@@ -3,6 +3,9 @@ package com.nx.lib.exception.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,6 +49,36 @@ public class NopsGlobalExceptionHandler {
 
         // 클라이언트 반환
         Error error = new Error(e.getCode(), e.getMessage());
+        ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+        return returnEnvelop;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ResponseEnvelop<?> handleValidationException(MethodArgumentNotValidException e) {
+        // 로그 기록
+        this.writeLog(e);
+
+        BindingResult bindingResult = e.getBindingResult();
+
+        String errorMsg = e.getMessage();
+        StringBuilder sb = new StringBuilder();
+        FieldError fieldError;
+        if (!bindingResult.getFieldErrors().isEmpty()) {
+            fieldError = bindingResult.getFieldErrors().get(0);
+
+            sb.append("[");
+            sb.append(fieldError.getField());
+            sb.append("](은)는 ");
+            sb.append(fieldError.getDefaultMessage());
+            sb.append(" 입력된 값: [");
+            sb.append(fieldError.getRejectedValue());
+            sb.append("]");
+            errorMsg = sb.toString();
+        }
+
+        // 클라이언트 반환
+        Error error = new Error("400", errorMsg);
         ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
         return returnEnvelop;
     }

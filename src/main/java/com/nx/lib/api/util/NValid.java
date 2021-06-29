@@ -2,6 +2,7 @@ package com.nx.lib.api.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -429,6 +430,144 @@ public class NValid {
         boolean valid = paramMapPredicate.test(params);
 
         validate(valid, "검증 로직 실패");
+        return this;
+    }
+
+    /**
+     * <p>
+     * 숫자형 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .isNumber();
+     *
+     * </pre>
+     */
+    public NValid isNumber() {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    continue;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
+            Object obj = params.get(k);
+            boolean bool = false;
+
+            if (obj instanceof Number) {
+                bool = true;
+            }
+
+            validate(bool, k, "숫자형 타입이어야 합니다.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
+     * 배열형 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .isArray();
+     *
+     * </pre>
+     */
+    public NValid isArray() {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    continue;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
+            Object obj = params.get(k);
+            boolean bool = false;
+
+            if (obj.getClass().isArray() || obj instanceof Collection) {
+                bool = true;
+            }
+
+            validate(bool, k, "배열 타입이어야 합니다.");
+        }
+        return this;
+    }
+
+    /**
+     * <p>
+     * 맵형 체크
+     * </p>
+     * <p>
+     * - Arrays 형태로 파라미터를 설정했을 경우 전부 체크
+     * </p>
+     * 
+     * <pre>
+     * #Example
+     * 
+     * NValid.of(map)
+     *      .key(mapKey)
+     *      .isArray();
+     *
+     * </pre>
+     */
+    public NValid isMap() {
+        checkMapAndKey();
+
+        for (String k : keyName) {
+            if (!params.containsKey(k)) {
+                if (!requireMode) {
+                    logger.debug("Skip :: {}", k);
+                    continue;
+                }
+                validate(false, k, "값이 없습니다.");
+                return this;
+            }
+
+            if (!requireMode && params.get(k) == null) {
+                continue; // 필수가 아닐때 값이 Null인 경우 무시
+            }
+
+            Object obj = params.get(k);
+            boolean bool = false;
+
+            if (obj instanceof Map) {
+                bool = true;
+            }
+
+            validate(bool, k, "맵 타입이어야 합니다.");
+        }
         return this;
     }
 

@@ -42,11 +42,11 @@ public class NopsUtil {
     public static final String SERVER_FREEZINGFIX = "35"; // 프리징픽스
     public static final String SERVER_COMPANY = "47"; // 전사테스트 서버
     public static final String SERVER_FGT = "50"; // FGT서버
-    
+
     public static final String SERVER_DEPLOY_QA = "50";
-    public static final String SERVER_DEPLOY_QAFIX = "35"; 
-    public static final String SERVER_DEPLOY_QA_OLD = "1"; 
-    public static final String SERVER_DEPLOY_QAFIX_OLD = "28"; 
+    public static final String SERVER_DEPLOY_QAFIX = "35";
+    public static final String SERVER_DEPLOY_QA_OLD = "1";
+    public static final String SERVER_DEPLOY_QAFIX_OLD = "28";
 
     public static final RestTemplate restTemplate = new RestTemplate();
 
@@ -86,7 +86,7 @@ public class NopsUtil {
             ip = request.getRemoteAddr();
         }
 
-        return ip;
+        return (ip == null)?"":ip.split(",")[0];
     }
 
     /**
@@ -172,7 +172,7 @@ public class NopsUtil {
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value = value.replace("\"", "\"\"");
-                            //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
+                            // 콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -180,7 +180,7 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0 && i < list.size()-1) {
+                    if (map.size() > 0 && i < list.size() - 1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append("\n");
                     }
                     i++;
@@ -192,7 +192,6 @@ public class NopsUtil {
             return "";
         }
     }
-
 
     /**
      * 입력으로 받은 테이블을 읽어서 CSV 형식으로 변환한다.
@@ -225,18 +224,18 @@ public class NopsUtil {
                         String value = String.valueOf(entry.getValue());
 
                         // 소수점 뒷자리가 .0일경우 제거
-                        if( isNumber(value) ) {
+                        if (isNumber(value)) {
                             double doubleVal = Double.parseDouble(value);
-                            double result = doubleVal - (int)doubleVal;
-                            if(result == 0) {
-                                value = (int)doubleVal + "";
+                            double result = doubleVal - (int) doubleVal;
+                            if (result == 0) {
+                                value = (int) doubleVal + "";
                             }
                         }
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value = value.replace("\"", "\"\"");
-                            //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
+                            // 콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -244,7 +243,7 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0 && i < list.size()-1) {
+                    if (map.size() > 0 && i < list.size() - 1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append(carriageReturn);
                     }
                     i++;
@@ -256,7 +255,6 @@ public class NopsUtil {
             return "";
         }
     }
-
 
     /**
      * 입력으로 받은 테이블을 읽어서 CSV 형식으로 변환한다.
@@ -300,7 +298,7 @@ public class NopsUtil {
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value = value.replace("\"", "\"\"");
-                            //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
+                            // 콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -308,7 +306,7 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0 && i < list.size()-1) {
+                    if (map.size() > 0 && i < list.size() - 1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append("\n");
                     }
                     i++;
@@ -320,7 +318,6 @@ public class NopsUtil {
             return "";
         }
     }
-
 
     /**
      * 입력으로 받은 테이블을 읽어서 CSV 형식으로 변환한다.
@@ -353,18 +350,18 @@ public class NopsUtil {
                         String value = String.valueOf(entry.getValue());
 
                         // 소수점 뒷자리가 .0일경우 제거
-                        if( isNumber(value) ) {
+                        if (isNumber(value)) {
                             double doubleVal = Double.parseDouble(value);
-                            double result = doubleVal - (int)doubleVal;
-                            if(result == 0) {
-                                value = (int)doubleVal + "";
+                            double result = doubleVal - (int) doubleVal;
+                            if (result == 0) {
+                                value = (int) doubleVal + "";
                             }
                         }
 
                         if (value.contains(",") || value.contains("\n") || value.contains("\"")) {
                             // 콤마 또는 줄바꿈이 내용안에 포함되어있고 쌍따옴표가 가 내용안에 포함되어 있으면 쌍따옴표를 2개로 바꿔줌.
                             value = value.replace("\"", "\"\"");
-                            //콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
+                            // 콤마 또는 줄바꿈이 중간에 있으면 " 으로 감싸줌
                             str.append("\"").append(value).append("\"");
                         } else {
                             str.append(value);
@@ -372,7 +369,7 @@ public class NopsUtil {
                         str.append(",");
                     }
 
-                    if (map.size() > 0 && i < list.size()-1) {
+                    if (map.size() > 0 && i < list.size() - 1) {
                         str.deleteCharAt(str.lastIndexOf(",")).append(carriageReturn);
                     }
                     i++;

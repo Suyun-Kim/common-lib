@@ -331,7 +331,7 @@ public class CrossAPI {
     @Deprecated
     private String authorizationToken() {
         String env = getProfile();
-        return (env != null && (env.equals("production") || env.equals("cbt"))) ? CROSS_API_TOKEN_LIVE_TMP
+        return (env != null && (NopsUtil.isLive() || env.equals("cbt"))) ? CROSS_API_TOKEN_LIVE_TMP
                 : CROSS_API_TOKEN;
     }
 

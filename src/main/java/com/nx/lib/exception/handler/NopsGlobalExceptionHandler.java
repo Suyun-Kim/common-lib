@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -142,6 +143,18 @@ public class NopsGlobalExceptionHandler {
 
 		// 클라이언트 반환
 		Error error = new Error(e.getCode(), e.getMessage());
+		ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+		return returnEnvelop;
+	}
+
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED) // 405
+	public ResponseEnvelop<Void> handleRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+		// 로그 기록
+		this.writeLog(e);
+
+		// 클라이언트 반환
+		Error error = new Error("400", "지원하지 않는 METHOD 타입 입니다.");
 		ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
 		return returnEnvelop;
 	}

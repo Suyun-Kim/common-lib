@@ -68,6 +68,11 @@ public class NopsUtil {
 		return "production".equals(profiles()) || "jproduction".equals(profiles()) || "cproduction".equals(profiles());
 	}
 
+	public static boolean isKorea() {
+		return "dev".equals(profiles()) || "ndev".equals(profiles()) || "tdev".equals(profiles())
+				|| "production".equals(profiles()) || "qa".equals(profiles());
+	}
+
 	public static String getLanguage() {
 		if (RequestContextHolder.getRequestAttributes() == null)
 			return "ko"; // Default

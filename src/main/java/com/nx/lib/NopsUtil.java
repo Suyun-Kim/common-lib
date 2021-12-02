@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -55,6 +56,8 @@ public class NopsUtil {
 	public static final RestTemplate restTemplate = new RestTemplate();
 
 	private static String PROFILES = null;
+	private static List<String> koreaProfiles = Arrays.asList("default", "local", "dev", "tdev", "ndev", "qa", "cbt",
+			"production");
 
 	public static String profiles() {
 		if (PROFILES == null) {
@@ -66,6 +69,13 @@ public class NopsUtil {
 
 	public static boolean isLive() {
 		return "production".equals(profiles()) || "jproduction".equals(profiles()) || "cproduction".equals(profiles());
+	}
+
+	public static String getLanguage(boolean forceKorea) {
+		if (forceKorea && koreaProfiles.contains(profiles()))
+			return "ko"; // 한국 DB엔 번역이 없어서 forceKorea + 한국 프로필은 ko로 헤더를 고정함.
+
+		return getLanguage();
 	}
 
 	public static String getLanguage() {

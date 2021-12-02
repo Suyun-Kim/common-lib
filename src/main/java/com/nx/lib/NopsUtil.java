@@ -76,7 +76,6 @@ public class NopsUtil {
 				.getRequest();
 
 		String lang = request.getHeader("lang");
-		System.out.println(lang);
 		return (lang == null) ? "ko" : lang;
 	}
 

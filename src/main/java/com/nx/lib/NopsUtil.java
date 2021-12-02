@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,7 +68,20 @@ public class NopsUtil {
 		return "production".equals(profiles()) || "jproduction".equals(profiles()) || "cproduction".equals(profiles());
 	}
 
+	public static String getLanguage() {
+		if (RequestContextHolder.getRequestAttributes() == null)
+			return "ko"; // Default
+
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+
+		String lang = request.getHeader("lang");
+		return (lang == null) ? "ko" : lang;
+	}
+
 	public static String getIpAddress() {
+		if (RequestContextHolder.getRequestAttributes() == null)
+			return "";
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();

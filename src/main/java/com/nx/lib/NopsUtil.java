@@ -69,23 +69,15 @@ public class NopsUtil {
 	}
 
 	public static String getLanguage() {
-		String headerLangSet = System.getProperty("nops.header.language");
-		if (headerLangSet == null || "off".equals(headerLangSet))
-			return "ko";
+		if (RequestContextHolder.getRequestAttributes() == null)
+			return "ko"; // Default
 
-		if ("on".equals(headerLangSet)) {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
 
-			if (RequestContextHolder.getRequestAttributes() == null)
-				return "ko"; // Default
-
-			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-					.getRequest();
-
-			String lang = request.getHeader("lang");
-			return (lang == null) ? "ko" : lang;
-		}
-
-		return "";
+		String lang = request.getHeader("lang");
+		System.out.println(lang);
+		return (lang == null) ? "ko" : lang;
 	}
 
 	public static String getIpAddress() {

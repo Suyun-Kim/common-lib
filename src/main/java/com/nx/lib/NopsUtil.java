@@ -68,20 +68,24 @@ public class NopsUtil {
 		return "production".equals(profiles()) || "jproduction".equals(profiles()) || "cproduction".equals(profiles());
 	}
 
-	public static boolean isKorea() {
-		return "dev".equals(profiles()) || "ndev".equals(profiles()) || "tdev".equals(profiles())
-				|| "production".equals(profiles()) || "qa".equals(profiles());
-	}
-
 	public static String getLanguage() {
-		if (RequestContextHolder.getRequestAttributes() == null)
-			return "ko"; // Default
+		String headerLangSet = System.getProperty("nops.header.language");
+		if (headerLangSet == null || "off".equals(headerLangSet))
+			return "ko";
 
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
+		if ("on".equals(headerLangSet)) {
 
-		String lang = request.getHeader("lang");
-		return (lang == null) ? "ko" : lang;
+			if (RequestContextHolder.getRequestAttributes() == null)
+				return "ko"; // Default
+
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+					.getRequest();
+
+			String lang = request.getHeader("lang");
+			return (lang == null) ? "ko" : lang;
+		}
+
+		return "";
 	}
 
 	public static String getIpAddress() {

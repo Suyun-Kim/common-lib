@@ -30,6 +30,7 @@ import com.nx.lib.exception.BaseException;
 
 public class NopsUtil {
 
+	// 싹 다 지워버리고 싶은데 어딘가에서 쓸 지 모른다.......
 	public static final String SERVER_FREEZING = "1"; // 프리징 서버
 	public static final String SERVER_DEV = "2"; // 개발서버
 	public static final String SERVER_DESIGN_TEST01 = "4"; // 기획테스트서버01
@@ -67,8 +68,10 @@ public class NopsUtil {
 		return PROFILES;
 	}
 
+	// TODO 게임별 라이브환경 프로필이 추가된다면 여기에 추가해 줘야해
 	public static boolean isLive() {
-		return "production".equals(profiles()) || "jproduction".equals(profiles()) || "cproduction".equals(profiles());
+		return "crproduction".equals(profiles()) || "production".equals(profiles()) || "jproduction".equals(profiles())
+				|| "cproduction".equals(profiles());
 	}
 
 	public static String getLanguage(boolean forceKorea) {

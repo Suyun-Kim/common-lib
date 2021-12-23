@@ -132,6 +132,20 @@ public class NopsUtil {
 
 		return "USER-Thread";
 	}
+	
+	/**
+	 * HttpServletRequest 에서 사용자 정보 가져오기
+	 * 
+	 * @return
+	 */
+	public static String getNopsUser() {
+		if (RequestContextHolder.getRequestAttributes() != null)
+			return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
+					.getHeader("nopsUserName");
+
+		return "Unknown";
+	}
+	
 
 	/**
 	 *

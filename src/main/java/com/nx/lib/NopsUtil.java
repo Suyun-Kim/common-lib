@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +57,7 @@ public class NopsUtil {
 	public static final String SERVER_DEPLOY_QAFIX_OLD = "28";
 
 	public static final RestTemplate restTemplate = new RestTemplate();
+	public static final ObjectMapper mapper = new ObjectMapper();
 
 	private static String PROFILES = null;
 	private static List<String> koreaProfiles = Arrays.asList("default", "local", "dev", "tdev", "ndev", "qa", "cbt",
@@ -132,20 +135,41 @@ public class NopsUtil {
 
 		return "USER-Thread";
 	}
-	
+
 	/**
 	 * HttpServletRequest 에서 사용자 정보 가져오기
 	 * 
 	 * @return
 	 */
 	public static String getNopsUser() {
+		String token = null;
 		if (RequestContextHolder.getRequestAttributes() != null)
-			return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-					.getHeader("nopsUserName");
+			token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
+					.getHeader("Authorization");
 
-		return "Unknown";
+		return String.valueOf(getAuthorizationPayload(token).getOrDefault("nops_name", "Unknown"));
 	}
-	
+
+	public static Map<String, Object> getAuthorizationPayload(String token) {
+		if (token == null || !token.startsWith("Bearer"))
+			return Collections.emptyMap();
+
+		String[] parts = token.replace("Bearer ", "").split("\\.");
+		if (parts.length != 3)
+			return Collections.emptyMap();
+
+		String base64EncodedBody = parts[1];
+
+		Base64 base64Url = new Base64(true);
+		String body = new String(base64Url.decode(base64EncodedBody));
+
+		try {
+			return mapper.readValue(body, new TypeReference<Map<String, String>>() {
+			});
+		} catch (IOException e) {
+			return Collections.emptyMap();
+		}
+	}
 
 	/**
 	 *
@@ -522,7 +546,6 @@ public class NopsUtil {
 	 * @return
 	 */
 	public static Map convertPageObjectToMapList(Page objectList, String... filter) {
-		ObjectMapper mapper = new ObjectMapper();
 		String json;
 		try {
 			json = mapper.writeValueAsString(objectList);
@@ -578,8 +601,6 @@ public class NopsUtil {
 	public static Map<String, Object> convertJsonToMap(String json, String... filter) {
 
 		Map<String, Object> map = new HashMap<>();
-		// convert JSON string to Map
-		ObjectMapper mapper = new ObjectMapper();
 		try {
 
 			map = mapper.readValue(json, new TypeReference<Map<String, Object>>() {

@@ -149,22 +149,24 @@ public class NopsUtil {
 
 		return String.valueOf(getAuthorizationPayload(token).getOrDefault("nops_name", "Unknown"));
 	}
+	
+	public static void main(String[] args) {
+		System.out.println(getAuthorizationPayload("Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGFjZV9uYW1lIjoiUGxhdGZvcm1EZXYiLCJ1c2VyX25hbWUiOiJyb290QGRldiIsInNjb3BlIjpbInJlYWQiLCJ3cml0ZSIsInRydXN0Il0sIm5vcHNfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJleHAiOjE2NDA1OTc0NTEsImF1dGhvcml0aWVzIjpbIlJPTEVfQ09NTU9OK05PIiwiUk9MRV9TVStBQSIsIlJPTEVfVVNFUl9UWVBFX05PUFMrTk8iXSwianRpIjoiZDQxZTk4OGQtOTljZC00YTU5LWIwZmItYWIzOGZhZDY3OTI3IiwiY2xpZW50X2lkIjoibnBpeGVsLWNsaWVudCJ9.Ghvh13pWOkX20xJhotK7OOm4RoiovGUnydGYx9HzWRKC8cFCG40qAdrBWCiTYlTUewjswLuFS-IYluI7c2bUnJ-0XOyYpmrP9JSPW4mlqZJSl0UiSSABAs3mXUX79Tg7mU3hosrjAdctq9qr6Tl18NXNsDz9sWgZG7wTU3ZK06c"));
+	}
 
 	public static Map<String, Object> getAuthorizationPayload(String token) {
 		if (token == null || !token.startsWith("Bearer"))
 			return Collections.emptyMap();
-
 		String[] parts = token.replace("Bearer ", "").split("\\.");
 		if (parts.length != 3)
 			return Collections.emptyMap();
-
 		String base64EncodedBody = parts[1];
 
 		Base64 base64Url = new Base64(true);
 		String body = new String(base64Url.decode(base64EncodedBody));
 
 		try {
-			return mapper.readValue(body, new TypeReference<Map<String, String>>() {
+			return mapper.readValue(body, new TypeReference<Map<String, Object>>() {
 			});
 		} catch (IOException e) {
 			return Collections.emptyMap();

@@ -142,12 +142,19 @@ public class NopsUtil {
 	 * @return
 	 */
 	public static String getNopsUser() {
+		return String.valueOf(getAuthorizationPayload(getAutorizationToken()).getOrDefault("nops_name", "Unknown"));
+	}
+
+	public static String getAutorizationToken() {
 		String token = null;
 		if (RequestContextHolder.getRequestAttributes() != null)
 			token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
 					.getHeader("Authorization");
+		return token;
+	}
 
-		return String.valueOf(getAuthorizationPayload(token).getOrDefault("nops_name", "Unknown"));
+	public static Map<String, Object> getAuthorizationPayload() {
+		return getAuthorizationPayload(getAutorizationToken());
 	}
 
 	public static Map<String, Object> getAuthorizationPayload(String token) {

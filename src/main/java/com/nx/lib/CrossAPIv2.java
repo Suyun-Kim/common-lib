@@ -201,7 +201,21 @@ public class CrossAPIv2 extends CrossAPI {
 	}
 
 	private List<ServiceInstance> getServiceInstance(String serviceId) {
-		List<ServiceInstance> instances = super.discoveryClient.getInstances(serviceId);
+		List<ServiceInstance> instances;
+
+		if (NopsUtil.isLive()) {
+			instances = super.discoveryClient.getInstances(serviceId);
+			if (instances.isEmpty())
+				throw new BaseException("1002", "EUREKA EXCEPTION : Eureka 인스턴스를 찾을 수 없습니다.");
+			return instances;
+		}
+
+		String profile = NopsUtil.profiles();
+		instances = super.discoveryClient.getInstances(profile + "-" + serviceId);
+
+		if (instances.isEmpty())
+			instances = super.discoveryClient.getInstances(serviceId);
+
 		if (instances.isEmpty())
 			throw new BaseException("1002", "EUREKA EXCEPTION : Eureka 인스턴스를 찾을 수 없습니다.");
 

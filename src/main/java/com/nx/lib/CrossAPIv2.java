@@ -229,6 +229,8 @@ public class CrossAPIv2 extends CrossAPI {
 	}
 
 	private void addOriginRequestHaeder(HttpHeaders headers) {
+		headers.add("cv", "2");
+		
 		if (RequestContextHolder.getRequestAttributes() == null)
 			return;
 

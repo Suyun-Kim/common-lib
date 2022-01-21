@@ -109,6 +109,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         HttpEntity requestEntity = new HttpEntity(headers);
 
@@ -147,6 +148,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         String bodyStr = "";
         try {
@@ -183,6 +185,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         String bodyStr = "";
         try {
@@ -225,6 +228,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         String bodyStr = "";
         try {
@@ -261,6 +265,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         String bodyStr = "";
         try {
@@ -314,6 +319,7 @@ public class CrossAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", bearer(token));
+        headers.add("cv", "1");
 
         ResponseEntity<Map> res = null;
         HttpEntity requestEntity = new HttpEntity(headers);

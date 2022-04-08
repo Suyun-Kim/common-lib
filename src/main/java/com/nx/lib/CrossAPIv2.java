@@ -211,6 +211,10 @@ public class CrossAPIv2 extends CrossAPI {
 		}
 
 		String profile = NopsUtil.profiles();
+
+		if ("local".equals(profile) || "default".equals(profile))
+			profile = "dev"; // 이외의 이상한 프로필의 경우 dev 인스턴스로 호출되도록 설정
+
 		instances = super.discoveryClient.getInstances(profile + "-" + serviceId);
 
 		if (instances.isEmpty())
@@ -230,7 +234,7 @@ public class CrossAPIv2 extends CrossAPI {
 
 	private void addOriginRequestHaeder(HttpHeaders headers) {
 		headers.add("cv", "2");
-		
+
 		if (RequestContextHolder.getRequestAttributes() == null)
 			return;
 

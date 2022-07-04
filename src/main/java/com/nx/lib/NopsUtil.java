@@ -518,6 +518,36 @@ public class NopsUtil {
 
 	}
 
+	public static boolean sendNotificationsAttachments(String host, String content, String attachments, String color,
+											String recipients) {
+
+		try {
+			String _host = (host == null) ? "http://noti.npixel.co.kr" : host;
+			final String notiUrl = _host + "/api/notification/v1.0/send";
+
+			HttpHeaders headers = new HttpHeaders();
+			Charset utf8 = Charset.forName("UTF-8");
+			MediaType mediaType = new MediaType("application", "json", utf8);
+			headers.setContentType(mediaType);
+
+			String requestJson = "{" + "\"data\": [{" + "\"send_type\": \"5\"," + "\"recipients\": [" + recipients
+					+ "]," + "\"bot_name\": \"NOPS Noti Service\"," + "\"content\": \"" + content + "\","
+					+ "\"attachments\":" + attachments
+					+ "}]" + "}";
+
+			HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
+			restTemplate.postForObject(notiUrl, entity, String.class);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+
+	}
+
 	/**
 	 * 현재 시간을 입력한 포맷에 맞게 출력
 	 * 

@@ -54,38 +54,39 @@ public class NopsGlobalExceptionHandler {
 		return returnEnvelop;
 	}
 
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST) // 400
-	public ResponseEnvelop<?> handleValidationException(MethodArgumentNotValidException e) {
-		// 로그 기록
-		this.writeLog(e);
-
-		BindingResult bindingResult = e.getBindingResult();
-
-		String errorMsg = e.getMessage();
-		StringBuilder sb = new StringBuilder();
-		FieldError fieldError;
-		if (!bindingResult.getFieldErrors().isEmpty()) {
-			fieldError = bindingResult.getFieldErrors().get(0);
-
-			sb.append("[");
-			sb.append(fieldError.getField());
-			sb.append("](은)는 ");
-			sb.append(fieldError.getDefaultMessage());
-			sb.append(" 입력된 값: [");
-			sb.append(fieldError.getRejectedValue());
-			sb.append("]");
-			errorMsg = sb.toString();
-		}
-
-		if (errorMsg.length() > 1000) {
-			errorMsg = errorMsg.substring(0, 1000); // List Valid시 너무 긴 ErrorMsg 대응
-		}
-
-		Error error = new Error("400", errorMsg);
-		ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
-		return returnEnvelop;
-	}
+//	@ExceptionHandler(MethodArgumentNotValidException.class)
+//	@ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+//	public ResponseEnvelop<?> handleValidationException(MethodArgumentNotValidException e) {
+//
+//		// 로그 기록
+//		this.writeLog(e);
+//
+//		BindingResult bindingResult = e.getBindingResult();
+//
+//		String errorMsg = e.getMessage();
+//		StringBuilder sb = new StringBuilder();
+//		FieldError fieldError;
+//		if (!bindingResult.getFieldErrors().isEmpty()) {
+//			fieldError = bindingResult.getFieldErrors().get(0);
+//
+//			sb.append("[");
+//			sb.append(fieldError.getField());
+//			sb.append("](은)는 ");
+//			sb.append(fieldError.getDefaultMessage());
+//			sb.append(" 입력된 값: [");
+//			sb.append(fieldError.getRejectedValue());
+//			sb.append("]");
+//			errorMsg = sb.toString();
+//		}
+//
+//		if (errorMsg.length() > 1000) {
+//			errorMsg = errorMsg.substring(0, 1000); // List Valid시 너무 긴 ErrorMsg 대응
+//		}
+//
+//		Error error = new Error("400", errorMsg);
+//		ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+//		return returnEnvelop;
+//	}
 
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST) // 400
@@ -170,6 +171,18 @@ public class NopsGlobalExceptionHandler {
 		return returnEnvelop;
 	}
 
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST) //400
+	public ResponseEnvelop<Void> handlerMethodArgumentNotValidException (MethodArgumentNotValidException e) {
+
+		FieldError fieldError = (FieldError) e.getBindingResult().getAllErrors().get(0);
+		Error error = new Error("4000", "파라미터 검증 오류\n[Key] : " + fieldError.getField() + " 값이 없거나 공백입니다.");
+		ResponseEnvelop<Void> returnEnvelop = new ResponseEnvelop<Void>(false, error);
+
+		return returnEnvelop;
+
+	}
+
 	private void writeLog(Exception ex) {
 		String cause = ex.getClass() == null ? "UNKNOWN" : ex.getClass().getName();
 		if (ex instanceof BaseException) {
@@ -180,4 +193,5 @@ public class NopsGlobalExceptionHandler {
 			logger.error("Template-LOG > |{}|{}|{}|", NopsUtil.getIpAddress(), cause, ex.getMessage(), ex);
 		}
 	}
+
 }
